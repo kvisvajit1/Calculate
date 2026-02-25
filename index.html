@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOO DUDE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* iOS THEME */
+        :root {
+            --ios-blue: #007AFF;
+            --ios-gray: #F2F2F7;
+            --ios-dark-gray: #1C1C1E;
+            --ios-light-text: #8E8E93;
+            --ios-red: #FF3B30;
+            --ios-green: #34C759;
+            --ios-purple: #AF52DE;
+            --ios-border: #D1D1D6;
+        }
+
+        /* Dark mode variables */
+        :root.dark-mode {
+            --ios-blue: #0A84FF;
+            --ios-gray: #1C1C1E;
+            --ios-dark-gray: #F2F2F7;
+            --ios-light-text: #8E8E93;
+            --ios-red: #FF453A;
+            --ios-green: #30D158;
+            --ios-purple: #BF5AF2;
+            --ios-border: #2C2C2E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: white;
+            color: black;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* NAVIGATION */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid var(--ios-border);
+        }
+
+        .dark-mode .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        .navbar-title {
+            font-size: 21px;
+            font-weight: 600;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar-actions i {
+            font-size: 20px;
+            color: var(--ios-blue);
+            cursor: pointer;
+        }
+
+        /* TAB BAR */
+        .tabbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--ios-border);
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dark-mode .tabbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        .tabbar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--ios-light-text);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .tabbar-item.active {
+            color: var(--ios-blue);
+        }
+
+        .tabbar-item i {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+
+        /* POST STYLES */
+        .feed {
+            padding-bottom: 70px;
+        }
+
+        .post {
+            padding: 15px;
+            border-bottom: 1px solid var(--ios-border);
+            position: relative;
+        }
+
+        .dark-mode .post {
+            border-bottom-color: var(--ios-dark-gray);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            object-fit: cover;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .post-user {
+            flex: 1;
+        }
+
+        .post-username {
+            font-weight: 600;
+            margin-bottom: 2px;
+            cursor: pointer;
+        }
+
+        .post-handle {
+            color: var(--ios-light-text);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .post-more {
+            color: var(--ios-light-text);
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+            line-height: 1.4;
+            font-size: 16px;
+        }
+
+        .post-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        .post-video {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            max-height: 400px;
+            background-color: #000;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            color: var(--ios-light-text);
+            font-size: 14px;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .post-action i {
+            font-size: 18px;
+        }
+
+        .post-action.like.active {
+            color: var(--ios-red);
+        }
+
+        .post-action.comment.active {
+            color: var(--ios-blue);
+        }
+
+        /* REELS STYLES */
+        .reels-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #000;
+            z-index: 500;
+            display: none;
+        }
+
+        .reels-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .reels-back-btn {
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .reels-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .reels-video-container {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .reel-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .reel-item.active {
+            display: block;
+        }
+
+        .reel-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reel-controls {
+            position: absolute;
+            bottom: 80px;
+            left: 15px;
+            right: 15px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .reel-user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .reel-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .reel-username {
+            font-weight: 600;
+        }
+
+        .reel-caption {
+            margin-top: 5px;
+            font-size: 14px;
+            max-width: 250px;
+        }
+
+        .reel-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .reel-action {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .reel-action i {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .reel-action span {
+            font-size: 14px;
+        }
+
+        .follow-btn.reel-follow {
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+        }
+
+        .follow-btn.reel-follow.following {
+            background-color: var(--ios-blue);
+            border-color: var(--ios-blue);
+        }
+
+        .reel-audio {
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        .reel-audio i {
+            font-size: 12px;
+        }
+
+        .reel-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        .reel-progress-bar {
+            height: 100%;
+            background-color: white;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 14px;
+            overflow: hidden;
+            animation: slideUp 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .dark-mode .modal-content {
+            background-color: #1C1C1E;
+            color: white;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 16px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid var(--ios-border);
+        }
+
+        .dark-mode .modal-header {
+            border-bottom-color: var(--ios-dark-gray);
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            font-weight: 600;
+            color: var(--ios-blue);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--ios-light-text);
+        }
+
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--ios-border);
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: transparent;
+            color: inherit;
+        }
+
+        .dark-mode .input-group input,
+        .dark-mode .input-group textarea,
+        .dark-mode .input-group select {
+            border-color: var(--ios-dark-gray);
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--ios-blue);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--ios-border);
+            color: var(--ios-blue);
+        }
+
+        .dark-mode .btn-outline {
+            border-color: var(--ios-dark-gray);
+        }
+
+        .btn-danger {
+            background-color: var(--ios-red);
+            color: white;
+        }
+
+        /* Compose Type Toggle */
+        .compose-type-toggle {
+            display: flex;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--ios-border);
+        }
+
+        .dark-mode .compose-type-toggle {
+            border-color: var(--ios-dark-gray);
+        }
+
+        .compose-type-toggle button {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: var(--ios-light-text);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .compose-type-toggle button.active {
+            background-color: var(--ios-blue);
+            color: white;
+        }
+
+        /* iOS STYLE COMMENT MODAL */
+        .ios-comment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .ios-comment-content {
+            background-color: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px 16px 0 0;
+            padding: 16px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dark-mode .ios-comment-content {
+            background-color: #1C1C1E;
+            color: white;
+        }
+
+        .ios-comment-content.active {
+            transform: translateY(0);
+        }
+
+        .ios-comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--ios-border);
+            margin-bottom: 16px;
+        }
+
+        .dark-mode .ios-comment-header {
+            border-bottom-color: var(--ios-dark-gray);
+        }
+
+        .ios-comment-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .ios-close-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--ios-blue);
+            padding: 8px;
+        }
+
+        .ios-comment-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .ios-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--ios-gray);
+            flex-shrink: 0;
+        }
+
+        .dark-mode .ios-user-avatar {
+            background-color: var(--ios-dark-gray);
+        }
+
+        .ios-comment-input {
+            flex-grow: 1;
+            border: 1px solid var(--ios-border);
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            min-height: 40px;
+            max-height: 120px;
+            background-color: transparent;
+            color: inherit;
+        }
+
+        .dark-mode .ios-comment-input {
+            border-color: var(--ios-dark-gray);
+        }
+
+        .ios-comment-input:focus {
+            border-color: var(--ios-blue);
+        }
+
+        .ios-post-button {
+            background-color: var(--ios-blue);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            align-self: flex-end;
+            opacity: 0.5;
+            transition: opacity 0.2s ease;
+        }
+
+        .ios-post-button.active {
+            opacity: 1;
+        }
+
+        .ios-comments-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .ios-comment-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .ios-comment-text {
+            background-color: var(--ios-gray);
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .dark-mode .ios-comment-text {
+            background-color: #2C2C2E;
+        }
+
+        .ios-comment-author {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        @media (min-width: 768px) {
+            .ios-comment-modal {
+                align-items: center;
+            }
+            
+            .ios-comment-content {
+                border-radius: 16px;
+                max-height: 70vh;
+            }
+        }
+
+        /* Hide other sections */
+        .search-container,
+        .activity-container,
+        .profile-container,
+        .messenger-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION BAR -->
+    <div class="navbar">
+        <div class="navbar-title" id="navbar-title">VISHU</div>
+        <div class="navbar-actions">
+            <i class="fas fa-search" id="search-btn"></i>
+            <i class="fas fa-comment" id="messenger-btn"></i>
+            <i class="fas fa-pen" id="compose-btn"></i>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT SECTIONS -->
+    <div class="feed" id="home-container">
+        <!-- Sample posts will be inserted here -->
+    </div>
+
+    <!-- Reels Container -->
+    <div class="reels-container" id="reels-container">
+        <div class="reels-header">
+            <div class="reels-back-btn" id="reels-back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </div>
+            <div class="reels-title">Reels</div>
+            <div style="width: 24px;"></div> <!-- Spacer for balance -->
+        </div>
+        
+        <div class="reels-video-container" id="reels-video-container">
+            <!-- Reel items will be inserted here -->
+        </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tabbar">
+        <div class="tabbar-item active" data-tab="home">
+            <i class="fas fa-house"></i>
+            <span>Home</span>
+        </div>
+        <div class="tabbar-item" data-tab="search">
+            <i class="fas fa-magnifying-glass"></i>
+            <span>Search</span>
+        </div>
+        <div class="tabbar-item" data-tab="reels">
+            <i class="fas fa-clapperboard"></i>
+            <span>Reels</span>
+        </div>
+        <div class="tabbar-item" data-tab="notifications">
+            <i class="fas fa-heart"></i>
+            <span>Activity</span>
+        </div>
+        <div class="tabbar-item" data-tab="profile" id="profile-tab">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </div>
+    </div>
+
+    <!-- iOS STYLE COMMENT MODAL -->
+    <div class="ios-comment-modal" id="ios-comment-modal">
+        <div class="ios-comment-content" id="ios-comment-content">
+            <div class="ios-comment-header">
+                <h2 class="ios-comment-title">Comments</h2>
+                <button class="ios-close-button" id="ios-close-button">×</button>
+            </div>
+            
+            <div class="ios-comment-input-container">
+                <div class="ios-user-avatar"></div>
+                <textarea class="ios-comment-input" id="ios-comment-input" placeholder="Add a comment..."></textarea>
+            </div>
+            
+            <button class="ios-post-button" id="ios-post-button" disabled>Post</button>
+            
+            <div class="ios-comments-list" id="ios-comments-list">
+                <!-- Comments will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Compose Modal -->
+    <div class="modal" id="compose-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-close" id="close-compose">Cancel</div>
+                <div class="modal-title">Create New</div>
+            </div>
+            <div class="modal-body">
+                <div class="compose-type-toggle">
+                    <button class="btn btn-outline active" data-type="post">Post</button>
+                    <button class="btn btn-outline" data-type="reel">Reel</button>
+                </div>
+                <div class="input-group">
+                    <textarea id="post-text" placeholder="What's happening?" style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid var(--ios-border); border-radius: 8px; font-size: 16px; resize: none;"></textarea>
+                </div>
+                <div class="media-preview" id="media-preview" style="display: none;">
+                    <div class="remove-media" id="remove-media">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <img id="media-preview-image" style="display: none;">
+                    <video id="media-preview-video" controls style="display: none;"></video>
+                </div>
+                <div class="compose-actions">
+                    <div class="attachment-btn" id="attachment-btn">
+                        <i class="fas fa-paperclip"></i>
+                    </div>
+                    <input type="file" id="media-upload" accept="image/*,video/*" style="display: none;">
+                    <button class="btn btn-primary" id="post-btn" style="flex: 1;">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // APP STATE
+        let currentUser = null;
+        let posts = [];
+        let comments = [];
+        let users = [
+            {
+                id: 1,
+                name: "Vishu Dev",
+                handle: "@vishu",
+                email: "vishu@example.com",
+                password: "password123",
+                avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+                bio: "Creator of VishuX Social. Building cool stuff on the web.",
+                following: 42,
+                followers: 128,
+                posts: 12,
+                privacy: "public",
+                followingUsers: [2, 3],
+                followersUsers: [2, 3, 4, 5]
+            },
+            {
+                id: 2,
+                name: "Alex Johnson",
+                handle: "@alexj",
+                email: "alex@example.com",
+                password: "password123",
+                avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+                bio: "Digital designer and photographer",
+                following: 56,
+                followers: 89,
+                posts: 23,
+                privacy: "public",
+                followingUsers: [1, 3],
+                followersUsers: [1, 3, 5]
+            },
+            {
+                id: 3,
+                name: "Sam Wilson",
+                handle: "@samwilson",
+                email: "sam@example.com",
+                password: "password123",
+                avatar: "https://randomuser.me/api/portraits/men/3.jpg",
+                bio: "Tech enthusiast and coffee lover",
+                following: 112,
+                followers: 45,
+                posts: 7,
+                privacy: "public",
+                followingUsers: [1, 2, 4],
+                followersUsers: [1, 2]
+            },
+            {
+                id: 4,
+                name: "Emma Stone",
+                handle: "@emmastone",
+                email: "emma@example.com",
+                password: "password123",
+                avatar: "https://randomuser.me/api/portraits/women/4.jpg",
+                bio: "Travel blogger and foodie",
+                following: 23,
+                followers: 156,
+                posts: 45,
+                privacy: "public",
+                followingUsers: [1, 3],
+                followersUsers: [1, 2, 3, 5]
+            },
+            {
+                id: 5,
+                name: "Michael Brown",
+                handle: "@michaelb",
+                email: "michael@example.com",
+                password: "password123",
+                avatar: "https://randomuser.me/api/portraits/men/5.jpg",
+                bio: "Fitness coach and nutrition expert",
+                following: 78,
+                followers: 234,
+                posts: 32,
+                privacy: "public",
+                followingUsers: [1, 2, 4],
+                followersUsers: [1, 2, 3, 4]
+            }
+        ];
+
+        // Reels data
+        let reels = [
+            {
+                id: 1,
+                userId: 4,
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                likes: 245,
+                comments: 35,
+                caption: "Beautiful Barcelona sunset 🌇",
+                timestamp: "2023-06-18T09:00:00Z",
+                isLiked: false,
+                audio: "Original Audio"
+            },
+            {
+                id: 2,
+                userId: 2,
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                likes: 189,
+                comments: 28,
+                caption: "New photography techniques 📸",
+                timestamp: "2023-06-17T14:30:00Z",
+                isLiked: false,
+                audio: "Original Audio"
+            },
+            {
+                id: 3,
+                userId: 3,
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                likes: 321,
+                comments: 42,
+                caption: "Morning coffee ritual ☕️",
+                timestamp: "2023-06-16T08:15:00Z",
+                isLiked: false,
+                audio: "Coffee Vibes"
+            },
+            {
+                id: 4,
+                userId: 5,
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                likes: 156,
+                comments: 19,
+                caption: "New personal best! 🏋️‍♂️",
+                timestamp: "2023-06-15T17:45:00Z",
+                isLiked: false,
+                audio: "Workout Mix"
+            },
+            {
+                id: 5,
+                userId: 1,
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                likes: 278,
+                comments: 31,
+                caption: "Behind the scenes of VishuX development 💻",
+                timestamp: "2023-06-14T11:20:00Z",
+                isLiked: false,
+                audio: "Coding Focus"
+            }
+        ];
+
+        let currentReelIndex = 0;
+        let isReelsPlaying = false;
+        let currentPostIdForComments = null;
+        let currentMediaFile = null;
+        let composeType = 'post'; // 'post' or 'reel'
+
+        // DOM ELEMENTS
+        const homeContainer = document.getElementById('home-container');
+        const reelsContainer = document.getElementById('reels-container');
+        const reelsVideoContainer = document.getElementById('reels-video-container');
+        const reelsBackBtn = document.getElementById('reels-back-btn');
+        const navbarTitle = document.getElementById('navbar-title');
+        const composeBtn = document.getElementById('compose-btn');
+        const profileTab = document.getElementById('profile-tab');
+        const tabItems = document.querySelectorAll('.tabbar-item');
+
+        // iOS Comment Modal elements
+        const iosCommentModal = document.getElementById('ios-comment-modal');
+        const iosCommentContent = document.getElementById('ios-comment-content');
+        const iosCloseButton = document.getElementById('ios-close-button');
+        const iosCommentInput = document.getElementById('ios-comment-input');
+        const iosPostButton = document.getElementById('ios-post-button');
+        const iosCommentsList = document.getElementById('ios-comments-list');
+
+        // Compose modal elements
+        const composeModal = document.getElementById('compose-modal');
+        const closeCompose = document.getElementById('close-compose');
+        const mediaPreview = document.getElementById('media-preview');
+        const mediaPreviewImage = document.getElementById('media-preview-image');
+        const mediaPreviewVideo = document.getElementById('media-preview-video');
+        const removeMedia = document.getElementById('remove-media');
+        const attachmentBtn = document.getElementById('attachment-btn');
+        const mediaUpload = document.getElementById('media-upload');
+        const postBtn = document.getElementById('post-btn');
+        const postText = document.getElementById('post-text');
+        const composeTypeToggle = document.querySelectorAll('.compose-type-toggle button');
+
+        // Generate sample posts
+        function generateSamplePosts() {
+            posts = [
+                {
+                    id: 1,
+                    userId: 1,
+                    userName: "Vishu Dev",
+                    userHandle: "@vishu",
+                    userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+                    content: "Just launched VishuX Social! Check it out and let me know what you think. #socialmedia #newapp",
+                    media: null,
+                    timestamp: "2023-06-15T09:00:00Z",
+                    likes: 24,
+                    comments: 3,
+                    shares: 5,
+                    isLiked: false,
+                    commentsExpanded: false
+                },
+                {
+                    id: 2,
+                    userId: 2,
+                    userName: "Alex Johnson",
+                    userHandle: "@alexj",
+                    userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+                    content: "Beautiful day for a photoshoot! Here's one of my favorite shots from today. #photography #nature",
+                    media: {
+                        type: "image",
+                        url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb"
+                    },
+                    timestamp: "2023-06-14T15:30:00Z",
+                    likes: 56,
+                    comments: 8,
+                    shares: 12,
+                    isLiked: false,
+                    commentsExpanded: false
+                },
+                {
+                    id: 3,
+                    userId: 3,
+                    userName: "Sam Wilson",
+                    userHandle: "@samwilson",
+                    userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+                    content: "Just upgraded my home office setup. New monitor and mechanical keyboard make such a difference! @vishu what's your setup like? #tech #workspace",
+                    media: null,
+                    timestamp: "2023-06-13T11:20:00Z",
+                    likes: 32,
+                    comments: 7,
+                    shares: 4,
+                    isLiked: false,
+                    commentsExpanded: false
+                }
+            ];
+
+            // Generate sample comments
+            comments = [
+                {
+                    id: 1,
+                    postId: 1,
+                    userId: 2,
+                    userName: "Alex Johnson",
+                    userHandle: "@alexj",
+                    userAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+                    content: "This looks amazing! Great job on the design.",
+                    timestamp: "2023-06-15T10:15:00Z",
+                    likes: 5,
+                    isLiked: false
+                },
+                {
+                    id: 2,
+                    postId: 1,
+                    userId: 3,
+                    userName: "Sam Wilson",
+                    userHandle: "@samwilson",
+                    userAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+                    content: "Can't wait to try it out! When will it be available on Android?",
+                    timestamp: "2023-06-15T11:30:00Z",
+                    likes: 3,
+                    isLiked: false
+                }
+            ];
+        }
+
+        // APP INITIALIZATION
+        function initApp() {
+            generateSamplePosts();
+            setupEventListeners();
+            renderFeed();
+            renderReels();
+        }
+
+        // EVENT LISTENERS
+        function setupEventListeners() {
+            // Tab switching
+            tabItems.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    
+                    tabItems.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show the appropriate content
+                    hideAllPages();
+                    
+                    switch(tabName) {
+                        case 'home':
+                            showHomePage();
+                            break;
+                        case 'reels':
+                            showReelsPage();
+                            break;
+                    }
+                });
+            });
+
+            // Reels back button
+            reelsBackBtn.addEventListener('click', () => {
+                hideReelsPage();
+                showHomePage();
+            });
+
+            // Compose button
+            composeBtn.addEventListener('click', () => {
+                showModal(composeModal);
+            });
+
+            // Compose modal close
+            closeCompose.addEventListener('click', () => hideModal(composeModal));
+
+            // Compose type toggle
+            composeTypeToggle.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    composeTypeToggle.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    composeType = this.dataset.type;
+                    
+                    if (composeType === 'reel') {
+                        postText.placeholder = "Add a caption...";
+                        mediaUpload.accept = "video/*";
+                    } else {
+                        postText.placeholder = "What's happening?";
+                        mediaUpload.accept = "image/*,video/*";
+                    }
+                });
+            });
+
+            // Media attachment
+            attachmentBtn.addEventListener('click', () => mediaUpload.click());
+            mediaUpload.addEventListener('change', handleMediaUpload);
+            removeMedia.addEventListener('click', removeMediaAttachment);
+
+            // Post creation
+            postBtn.addEventListener('click', handlePost);
+
+            // iOS Comment Modal functionality
+            iosCloseButton.addEventListener('click', closeIosCommentModal);
+            iosCommentModal.addEventListener('click', function(e) {
+                if (e.target === iosCommentModal) {
+                    closeIosCommentModal();
+                }
+            });
+            
+            iosCommentInput.addEventListener('input', function() {
+                if (iosCommentInput.value.trim() !== '') {
+                    iosPostButton.disabled = false;
+                    iosPostButton.classList.add('active');
+                } else {
+                    iosPostButton.disabled = true;
+                    iosPostButton.classList.remove('active');
+                }
+            });
+            
+            iosPostButton.addEventListener('click', handleIosPostComment);
+
+            // Touch events for reels scrolling
+            let startY = 0;
+            let currentY = 0;
+            let isSwiping = false;
+
+            reelsVideoContainer.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                isSwiping = true;
+            });
+
+            reelsVideoContainer.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                currentY = e.touches[0].clientY;
+            });
+
+            reelsVideoContainer.addEventListener('touchend', () => {
+                if (!isSwiping) return;
+                
+                const diff = startY - currentY;
+                const threshold = 50;
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0) {
+                        // Swipe up - next reel
+                        if (currentReelIndex < reels.length - 1) {
+                            changeReel(currentReelIndex + 1);
+                        }
+                    } else {
+                        // Swipe down - previous reel
+                        if (currentReelIndex > 0) {
+                            changeReel(currentReelIndex - 1);
+                        }
+                    }
+                }
+                
+                isSwiping = false;
+            });
+
+            // Keyboard events for reels
+            document.addEventListener('keydown', (e) => {
+                if (reelsContainer.style.display === 'block') {
+                    if (e.key === 'ArrowUp' && currentReelIndex > 0) {
+                        changeReel(currentReelIndex - 1);
+                    } else if (e.key === 'ArrowDown' && currentReelIndex < reels.length - 1) {
+                        changeReel(currentReelIndex + 1);
+                    } else if (e.key === ' ') {
+                        toggleReelPlayback();
+                    }
+                }
+            });
+        }
+
+        // REELS FUNCTIONS
+        function renderReels() {
+            reelsVideoContainer.innerHTML = '';
+            
+            reels.forEach((reel, index) => {
+                const reelItem = document.createElement('div');
+                reelItem.className = `reel-item ${index === 0 ? 'active' : ''}`;
+                reelItem.dataset.reelId = reel.id;
+                
+                const user = users.find(u => u.id === reel.userId);
+                
+                reelItem.innerHTML = `
+                    <div class="reel-progress">
+                        <div class="reel-progress-bar" id="progress-${reel.id}"></div>
+                    </div>
+                    <video class="reel-video" id="video-${reel.id}" loop>
+                        <source src="${reel.videoUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="reel-controls">
+                        <div class="reel-user-info">
+                            <img class="reel-user-avatar" src="${user.avatar}">
+                            <div>
+                                <div class="reel-username">${user.name}</div>
+                                <div class="reel-caption">${reel.caption}</div>
+                            </div>
+                            <button class="follow-btn reel-follow">Follow</button>
+                        </div>
+                        <div class="reel-actions">
+                            <div class="reel-action like ${reel.isLiked ? 'active' : ''}">
+                                <i class="${reel.isLiked ? 'fas' : 'far'} fa-heart"></i>
+                                <span class="reel-likes">${reel.likes}</span>
+                            </div>
+                            <div class="reel-action comment">
+                                <i class="far fa-comment"></i>
+                                <span class="reel-comments">${reel.comments}</span>
+                            </div>
+                            <div class="reel-action">
+                                <i class="fas fa-share"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reel-audio">
+                        <i class="fas fa-music"></i>
+                        <span>${reel.audio}</span>
+                    </div>
+                `;
+                
+                reelsVideoContainer.appendChild(reelItem);
+                
+                // Add event listeners for reel actions
+                const likeBtn = reelItem.querySelector('.reel-action.like');
+                const commentBtn = reelItem.querySelector('.reel-action.comment');
+                const followBtn = reelItem.querySelector('.reel-follow');
+                const video = reelItem.querySelector('.reel-video');
+                
+                likeBtn.addEventListener('click', () => handleReelLike(reel.id));
+                commentBtn.addEventListener('click', () => openIosCommentModal(reel.id, 'reel'));
+                followBtn.addEventListener('click', () => handleReelFollow(reel.userId, followBtn));
+                video.addEventListener('click', () => toggleReelPlayback());
+                
+                // Set up video progress tracking
+                video.addEventListener('timeupdate', () => {
+                    const progress = (video.currentTime / video.duration) * 100;
+                    document.getElementById(`progress-${reel.id}`).style.width = `${progress}%`;
+                });
+            });
+        }
+
+        function showReelsPage() {
+            hideAllPages();
+            reelsContainer.style.display = 'block';
+            navbarTitle.textContent = 'Reels';
+            
+            // Play the first reel
+            if (reels.length > 0) {
+                playReel(currentReelIndex);
+            }
+        }
+
+        function hideReelsPage() {
+            reelsContainer.style.display = 'none';
+            pauseAllReels();
+        }
+
+        function changeReel(index) {
+            if (index < 0 || index >= reels.length) return;
+            
+            pauseReel(currentReelIndex);
+            currentReelIndex = index;
+            playReel(currentReelIndex);
+            
+            // Update active reel display
+            document.querySelectorAll('.reel-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+        }
+
+        function playReel(index) {
+            const reel = reels[index];
+            const video = document.getElementById(`video-${reel.id}`);
+            
+            if (video) {
+                video.play().catch(e => console.log("Video play failed:", e));
+                isReelsPlaying = true;
+            }
+        }
+
+        function pauseReel(index) {
+            const reel = reels[index];
+            const video = document.getElementById(`video-${reel.id}`);
+            
+            if (video) {
+                video.pause();
+            }
+        }
+
+        function pauseAllReels() {
+            reels.forEach((reel, index) => {
+                pauseReel(index);
+            });
+            isReelsPlaying = false;
+        }
+
+        function toggleReelPlayback() {
+            const reel = reels[currentReelIndex];
+            const video = document.getElementById(`video-${reel.id}`);
+            
+            if (video.paused) {
+                video.play();
+                isReelsPlaying = true;
+            } else {
+                video.pause();
+                isReelsPlaying = false;
+            }
+        }
+
+        function handleReelLike(reelId) {
+            const reel = reels.find(r => r.id === reelId);
+            if (!reel) return;
+            
+            const likeBtn = document.querySelector(`.reel-item[data-reel-id="${reelId}"] .reel-action.like`);
+            const likeIcon = likeBtn.querySelector('i');
+            const likeCount = likeBtn.querySelector('.reel-likes');
+            
+            if (reel.isLiked) {
+                reel.isLiked = false;
+                reel.likes--;
+                likeBtn.classList.remove('active');
+                likeIcon.classList.remove('fas');
+                likeIcon.classList.add('far');
+            } else {
+                reel.isLiked = true;
+                reel.likes++;
+                likeBtn.classList.add('active');
+                likeIcon.classList.remove('far');
+                likeIcon.classList.add('fas');
+            }
+            
+            likeCount.textContent = reel.likes;
+        }
+
+        function handleReelFollow(userId, followBtn) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            if (followBtn.textContent === 'Follow') {
+                followBtn.textContent = 'Following';
+                followBtn.classList.add('following');
+                // In a real app, you would add to current user's following list
+            } else {
+                followBtn.textContent = 'Follow';
+                followBtn.classList.remove('following');
+                // In a real app, you would remove from current user's following list
+            }
+        }
+
+        // PAGE NAVIGATION
+        function hideAllPages() {
+            homeContainer.style.display = 'none';
+            reelsContainer.style.display = 'none';
+        }
+
+        function showHomePage() {
+            hideAllPages();
+            homeContainer.style.display = 'block';
+            navbarTitle.textContent = 'VishuX';
+        }
+
+        // iOS COMMENT MODAL FUNCTIONS
+        function openIosCommentModal(itemId, type = 'post') {
+            currentPostIdForComments = itemId;
+            iosCommentModal.style.display = 'flex';
+            setTimeout(() => {
+                iosCommentContent.classList.add('active');
+            }, 10);
+            
+            if (type === 'post') {
+                renderIosComments(itemId);
+            } else {
+                // For reels, we would render reel comments
+                renderIosComments(itemId);
+            }
+        }
+
+        function closeIosCommentModal() {
+            iosCommentContent.classList.remove('active');
+            setTimeout(() => {
+                iosCommentModal.style.display = 'none';
+            }, 300);
+        }
+
+        function renderIosComments(itemId) {
+            const itemComments = comments.filter(c => c.postId === itemId);
+            
+            iosCommentsList.innerHTML = '';
+            
+            if (itemComments.length === 0) {
+                iosCommentsList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No comments yet. Be the first to comment!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            itemComments.forEach(comment => {
+                const commentItem = document.createElement('div');
+                commentItem.className = 'ios-comment-item';
+                
+                commentItem.innerHTML = `
+                    <div class="ios-user-avatar" style="background-image: url(${comment.userAvatar}); background-size: cover;"></div>
+                    <div>
+                        <div class="ios-comment-author">${comment.userName}</div>
+                        <div class="ios-comment-text">${comment.content}</div>
+                    </div>
+                `;
+                
+                iosCommentsList.appendChild(commentItem);
+            });
+        }
+
+        function handleIosPostComment() {
+            const commentText = iosCommentInput.value.trim();
+            if (commentText) {
+                // Add new comment
+                const newComment = {
+                    id: comments.length + 1,
+                    postId: currentPostIdForComments,
+                    userId: 1, // In a real app, this would be current user's ID
+                    userName: "You",
+                    userHandle: "@you",
+                    userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+                    content: commentText,
+                    timestamp: new Date().toISOString(),
+                    likes: 0,
+                    isLiked: false
+                };
+                
+                comments.unshift(newComment);
+                
+                // Update UI
+                renderIosComments(currentPostIdForComments);
+                
+                // Update post/reel comment count
+                const post = posts.find(p => p.id === currentPostIdForComments);
+                if (post) {
+                    post.comments++;
+                    renderFeed();
+                }
+                
+                const reel = reels.find(r => r.id === currentPostIdForComments);
+                if (reel) {
+                    reel.comments++;
+                    // Update reel comment count in UI
+                    const commentCount = document.querySelector(`.reel-item[data-reel-id="${reel.id}"] .reel-comments`);
+                    if (commentCount) {
+                        commentCount.textContent = reel.comments;
+                    }
+                }
+                
+                // Clear input
+                iosCommentInput.value = '';
+                iosPostButton.disabled = true;
+                iosPostButton.classList.remove('active');
+            }
+        }
+
+        // MEDIA HANDLING
+        function handleMediaUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            currentMediaFile = file;
+            
+            // Check if it's an image or video
+            if (file.type.startsWith('image/')) {
+                mediaPreview.style.display = 'block';
+                mediaPreviewImage.style.display = 'block';
+                mediaPreviewVideo.style.display = 'none';
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    mediaPreviewImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type.startsWith('video/')) {
+                mediaPreview.style.display = 'block';
+                mediaPreviewImage.style.display = 'none';
+                mediaPreviewVideo.style.display = 'block';
+                
+                const videoURL = URL.createObjectURL(file);
+                mediaPreviewVideo.src = videoURL;
+            }
+        }
+
+        function removeMediaAttachment() {
+            mediaPreview.style.display = 'none';
+            mediaPreviewImage.style.display = 'none';
+            mediaPreviewVideo.style.display = 'none';
+            mediaPreviewImage.src = '';
+            mediaPreviewVideo.src = '';
+            mediaUpload.value = '';
+            currentMediaFile = null;
+        }
+
+        // POST FUNCTIONS
+        function handlePost() {
+            const content = postText.value;
+            
+            if (!content && !currentMediaFile) {
+                alert('Post cannot be empty');
+                return;
+            }
+            
+            let mediaData = null;
+            if (currentMediaFile) {
+                if (currentMediaFile.type.startsWith('image/')) {
+                    mediaData = {
+                        type: "image",
+                        url: URL.createObjectURL(currentMediaFile)
+                    };
+                } else if (currentMediaFile.type.startsWith('video/')) {
+                    mediaData = {
+                        type: "video",
+                        url: URL.createObjectURL(currentMediaFile)
+                    };
+                }
+            }
+            
+            if (composeType === 'post') {
+                const newPost = {
+                    id: posts.length + 1,
+                    userId: 1, // In a real app, this would be current user's ID
+                    userName: "You",
+                    userHandle: "@you",
+                    userAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+                    content: content,
+                    media: mediaData,
+                    timestamp: new Date().toISOString(),
+                    likes: 0,
+                    comments: 0,
+                    shares: 0,
+                    isLiked: false,
+                    commentsExpanded: false
+                };
+                
+                posts.unshift(newPost);
+            } else if (composeType === 'reel') {
+                const newReel = {
+                    id: reels.length + 1,
+                    userId: 1, // In a real app, this would be current user's ID
+                    videoUrl: mediaData ? mediaData.url : "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+                    likes: 0,
+                    comments: 0,
+                    caption: content,
+                    timestamp: new Date().toISOString(),
+                    isLiked: false,
+                    audio: "Original Audio"
+                };
+                
+                reels.unshift(newReel);
+                renderReels();
+            }
+            
+            hideModal(composeModal);
+            renderFeed();
+            
+            // Clear the post text and media
+            postText.value = '';
+            removeMediaAttachment();
+        }
+
+        function renderFeed() {
+            if (posts.length === 0) {
+                homeContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="far fa-comment-dots" style="font-size: 40px; margin-bottom: 15px;"></i>
+                        <p>No posts yet. Be the first to post!</p>
+                        <button style="margin-top: 15px; padding: 10px 20px; background-color: var(--ios-blue); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="showModal(composeModal)">Create Post</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            homeContainer.innerHTML = '';
+            
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.dataset.postId = post.id;
+                
+                // Media HTML
+                let mediaHtml = '';
+                if (post.media) {
+                    if (post.media.type === 'image') {
+                        mediaHtml = `<img src="${post.media.url}" class="post-image">`;
+                    } else if (post.media.type === 'video') {
+                        mediaHtml = `<video src="${post.media.url}" class="post-video" controls></video>`;
+                    }
+                }
+                
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <img src="${post.userAvatar}" class="post-avatar">
+                        <div class="post-user">
+                            <div class="post-username">${post.userName}</div>
+                            <div class="post-handle">${post.userHandle}</div>
+                        </div>
+                        <div class="post-more">···</div>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    ${mediaHtml}
+                    <div class="post-actions">
+                        <div class="post-action like ${post.isLiked ? 'active' : ''}">
+                            <i class="${post.isLiked ? 'fas' : 'far'} fa-heart"></i>
+                            <span>${post.likes}</span>
+                        </div>
+                        <div class="post-action comment">
+                            <i class="far fa-comment"></i>
+                            <span>${post.comments}</span>
+                        </div>
+                        <div class="post-action">
+                            <i class="fas fa-share"></i>
+                        </div>
+                    </div>
+                `;
+                
+                homeContainer.appendChild(postElement);
+                
+                // Add click event to comment button
+                const commentBtn = postElement.querySelector('.post-action.comment');
+                if (commentBtn) {
+                    commentBtn.addEventListener('click', function() {
+                        openIosCommentModal(post.id);
+                    });
+                }
+            });
+        }
+
+        // UTILITY FUNCTIONS
+        function showModal(modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideModal(modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // Reset forms when hiding
+            if (modal === composeModal) {
+                postText.value = '';
+                removeMediaAttachment();
+                // Reset to post type
+                composeTypeToggle[0].click();
+            }
+        }
+
+        // INITIALIZE APP
+        initApp();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>VishuX Files</title>
+
+    <!-- CSS -->
+    <style>
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #e8ecf0;
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-bg-strong: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: rgba(0, 0, 0, 0.06);
+            --text-primary: #1a1a2e;
+            --text-secondary: #555;
+            --text-tertiary: #888;
+            --accent: #007aff;
+            --accent-soft: #e8f2ff;
+            --tab-active-bg: rgba(255, 255, 255, 0.85);
+            --tab-inactive-text: #999;
+            --card-bg: rgba(255, 255, 255, 0.5);
+            --card-hover: rgba(255, 255, 255, 0.7);
+            --divider: rgba(0, 0, 0, 0.08);
+            --notch-bg: rgba(255, 255, 255, 0.7);
+            --button-glass: rgba(255, 255, 255, 0.6);
+            --badge-bg: rgba(0, 122, 255, 0.1);
+            --icon-fill: #333;
+            --storage-bar-bg: rgba(0, 0, 0, 0.06);
+            --storage-bar-fill: #007aff;
+            --danger: #ff3b30;
+            --success: #34c759;
+            --warning: #ff9500;
+            --backdrop-blur: 24px;
+            --border-radius-lg: 28px;
+            --border-radius-md: 18px;
+            --border-radius-sm: 12px;
+            --border-radius-xs: 8px;
+            --transition-speed: 0.3s;
+        }
+
+        /* Deep Dark Mode */
+        body.deep-dark {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --glass-bg: rgba(28, 28, 40, 0.65);
+            --glass-bg-strong: rgba(32, 32, 48, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.4);
+            --text-primary: #f0f0f5;
+            --text-secondary: #b0b0c0;
+            --text-tertiary: #777;
+            --accent: #4da6ff;
+            --accent-soft: rgba(77, 166, 255, 0.12);
+            --tab-active-bg: rgba(40, 40, 60, 0.85);
+            --tab-inactive-text: #666;
+            --card-bg: rgba(28, 28, 42, 0.55);
+            --card-hover: rgba(36, 36, 54, 0.75);
+            --divider: rgba(255, 255, 255, 0.06);
+            --notch-bg: rgba(20, 20, 32, 0.75);
+            --button-glass: rgba(40, 40, 60, 0.65);
+            --badge-bg: rgba(77, 166, 255, 0.15);
+            --icon-fill: #e0e0e8;
+            --storage-bar-bg: rgba(255, 255, 255, 0.08);
+            --storage-bar-fill: #4da6ff;
+            --danger: #ff453a;
+            --success: #30d158;
+            --warning: #ff9f0a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        /* Subtle animated background orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            transition: all 0.8s ease;
+        }
+        .bg-orb.orb-1 {
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, #007aff 0%, transparent 70%);
+            top: -80px;
+            right: -60px;
+        }
+        .bg-orb.orb-2 {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, #5856d6 0%, transparent 70%);
+            bottom: -60px;
+            left: -70px;
+        }
+        .bg-orb.orb-3 {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, #ff9500 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        body.deep-dark .bg-orb {
+            opacity: 0.1;
+        }
+        body.deep-dark .bg-orb.orb-1 {
+            background: radial-gradient(circle, #4da6ff 0%, transparent 70%);
+        }
+        body.deep-dark .bg-orb.orb-2 {
+            background: radial-gradient(circle, #7b6cf6 0%, transparent 70%);
+        }
+        body.deep-dark .bg-orb.orb-3 {
+            background: radial-gradient(circle, #ff9f0a 0%, transparent 70%);
+        }
+
+        /* Main container */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 16px;
+            padding-top: env(safe-area-inset-top, 16px);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        /* Header / Top Bar */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 4px;
+            gap: 10px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+            flex-shrink: 0;
+            transition: color var(--transition-speed) ease;
+        }
+        .app-title .dot {
+            color: var(--accent);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Glass button */
+        .glass-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--button-glass);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--icon-fill);
+            position: relative;
+            box-shadow: 0 2px 8px var(--glass-shadow);
+            flex-shrink: 0;
+        }
+        .glass-btn:active {
+            transform: scale(0.93);
+            background: var(--card-hover);
+            box-shadow: 0 1px 3px var(--glass-shadow);
+        }
+        .glass-btn svg {
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+        }
+        .glass-btn.upload-btn {
+            width: 42px;
+            height: 42px;
+            background: var(--accent-soft);
+            border-color: rgba(0, 122, 255, 0.25);
+            color: var(--accent);
+        }
+        body.deep-dark .glass-btn.upload-btn {
+            border-color: rgba(77, 166, 255, 0.3);
+        }
+        .glass-btn.dark-toggle {
+            position: relative;
+        }
+        .glass-btn.dark-toggle .icon-sun,
+        .glass-btn.dark-toggle .icon-moon {
+            position: absolute;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .glass-btn.dark-toggle .icon-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .glass-btn.dark-toggle .icon-moon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.7);
+        }
+        body.deep-dark .glass-btn.dark-toggle .icon-sun {
+            opacity: 0;
+            transform: rotate(90deg) scale(0.7);
+        }
+        body.deep-dark .glass-btn.dark-toggle .icon-moon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+
+        /* Storage info chip */
+        .storage-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--glass-border);
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            box-shadow: 0 1px 4px var(--glass-shadow);
+            transition: all var(--transition-speed) ease;
+            flex-shrink: 0;
+            cursor: default;
+        }
+        .storage-chip .chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            flex-shrink: 0;
+        }
+        .storage-chip.warning .chip-dot {
+            background: var(--warning);
+        }
+        .storage-chip.danger .chip-dot {
+            background: var(--danger);
+        }
+
+        /* Notch Tab Bar */
+        .notch-tab-bar {
+            display: flex;
+            background: var(--notch-bg);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border-radius: var(--border-radius-lg);
+            padding: 5px;
+            margin: 8px 0 14px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 16px var(--glass-shadow);
+            position: relative;
+            flex-shrink: 0;
+            transition: all var(--transition-speed) ease;
+        }
+        .notch-tab {
+            flex: 1;
+            text-align: center;
+            padding: 11px 8px;
+            border-radius: 22px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            color: var(--tab-inactive-text);
+            letter-spacing: -0.1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .notch-tab.active {
+            background: var(--tab-active-bg);
+            color: var(--accent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+        }
+        body.deep-dark .notch-tab.active {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+        .notch-tab .tab-icon {
+            width: 16px;
+            height: 16px;
+        }
+        .notch-tab .tab-count {
+            font-size: 0.65rem;
+            background: var(--badge-bg);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Content area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px;
+        }
+        .content-area::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* File grid */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .file-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--border-radius-md);
+            padding: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 10px var(--glass-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .file-card:active {
+            transform: scale(0.96);
+            background: var(--card-hover);
+            box-shadow: 0 1px 4px var(--glass-shadow);
+        }
+        .file-card .file-thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--border-radius-sm);
+            object-fit: cover;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background var(--transition-speed) ease;
+        }
+        .file-card .file-thumb svg {
+            width: 28px;
+            height: 28px;
+            opacity: 0.7;
+        }
+        .file-card .file-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+            color: var(--text-primary);
+            transition: color var(--transition-speed) ease;
+        }
+        .file-card .file-meta {
+            font-size: 0.6rem;
+            color: var(--text-tertiary);
+        }
+        .file-card .hide-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .file-card.hidden-item .hide-indicator {
+            opacity: 1;
+        }
+        .file-card .hide-indicator svg {
+            width: 11px;
+            height: 11px;
+            color: var(--accent);
+        }
+
+        /* List view */
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .file-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--card-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 6px var(--glass-shadow);
+        }
+        .file-list-item:active {
+            background: var(--card-hover);
+            transform: scale(0.985);
+        }
+        .file-list-item .fl-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+        }
+        .file-list-item .fl-thumb svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+        .file-list-item .fl-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .file-list-item .fl-name {
+            font-weight: 500;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-primary);
+        }
+        .file-list-item .fl-meta {
+            font-size: 0.68rem;
+            color: var(--text-tertiary);
+        }
+        .file-list-item .fl-action {
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 20px;
+            text-align: center;
+            gap: 12px;
+        }
+        .empty-state .empty-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 16px var(--glass-shadow);
+        }
+        .empty-state .empty-icon svg {
+            width: 32px;
+            height: 32px;
+            opacity: 0.5;
+        }
+        .empty-state .empty-text {
+            font-weight: 500;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        /* Bottom action bar */
+        .bottom-bar {
+            display: flex;
+            gap: 10px;
+            padding: 12px 0;
+            flex-shrink: 0;
+            padding-bottom: max(12px, env(safe-area-inset-bottom, 16px));
+        }
+        .action-btn {
+            flex: 1;
+            padding: 13px;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-align: center;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px var(--glass-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .action-btn:active {
+            transform: scale(0.95);
+            background: var(--card-hover);
+        }
+        .action-btn.primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
+        }
+        .action-btn.primary:active {
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.4);
+            background: #006ee6;
+        }
+        .action-btn.danger-outline {
+            border-color: rgba(255, 59, 48, 0.4);
+            color: var(--danger);
+        }
+
+        /* Hidden folders section */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 4px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            letter-spacing: -0.1px;
+        }
+        .section-badge {
+            font-size: 0.65rem;
+            background: var(--badge-bg);
+            color: var(--accent);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 100;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-sheet {
+            width: 100%;
+            max-width: 500px;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px 24px 0 0;
+            padding: 20px 20px 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+            transform: translateY(100%);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+        .modal-handle {
+            width: 36px;
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(128, 128, 128, 0.4);
+            margin: 0 auto 16px;
+        }
+        .modal-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        .modal-option {
+            padding: 14px 16px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        .modal-option:active {
+            background: var(--card-hover);
+            transform: scale(0.97);
+        }
+        .modal-option.danger {
+            color: var(--danger);
+            border-color: rgba(255, 59, 48, 0.3);
+        }
+        .modal-cancel {
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 22px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            z-index: 200;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            color: var(--text-primary);
+            white-space: nowrap;
+            text-align: center;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive */
+        @media (min-width: 420px) {
+            .file-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+            }
+            .file-card .file-thumb {
+                width: 64px;
+                height: 64px;
+            }
+        }
+        @media (max-width: 340px) {
+            .file-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .notch-tab {
+                font-size: 0.7rem;
+                padding: 9px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background orbs -->
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <!-- App Container -->
+    <div class="app-container" id="appContainer">
+        <!-- Header -->
+        <div class="header">
+            <span class="app-title">VishuX<span class="dot">.</span> Files</span>
+            <div class="header-actions">
+                <!-- Storage chip -->
+                <div class="storage-chip" id="storageChip" title="Storage">
+                    <span class="chip-dot"></span>
+                    <span id="storageText">-- GB / -- GB</span>
+                </div>
+                <!-- Dark mode toggle -->
+                <button class="glass-btn dark-toggle" id="darkToggle" aria-label="Toggle dark mode" title="Deep Dark Mode">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <!-- Upload button -->
+                <button class="glass-btn upload-btn" id="uploadBtn" aria-label="Upload files" title="Upload Files">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Notch Tab Bar -->
+        <div class="notch-tab-bar" id="notchTabBar">
+            <div class="notch-tab active" data-tab="pictures">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Pictures
+                <span class="tab-count" id="countPictures">0</span>
+            </div>
+            <div class="notch-tab" data-tab="videos">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                Videos
+                <span class="tab-count" id="countVideos">0</span>
+            </div>
+            <div class="notch-tab" data-tab="files">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                Files
+                <span class="tab-count" id="countFiles">0</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area" id="contentArea">
+            <!-- Hidden section -->
+            <div class="section-header">
+                <span class="section-title">&#9679; Hidden Folders</span>
+                <span class="section-badge" id="hiddenCount">0 hidden</span>
+            </div>
+            <div class="file-list" id="hiddenFoldersList">
+                <div class="empty-state" id="hiddenEmpty">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                    </div>
+                    <span class="empty-text">No hidden folders yet</span>
+                </div>
+            </div>
+
+            <!-- Visible files section -->
+            <div class="section-header" style="margin-top:14px;">
+                <span class="section-title">&#9679; <span id="currentTabLabel">Pictures</span></span>
+                <span class="section-badge" id="visibleCount">0 items</span>
+            </div>
+            <div class="file-grid" id="fileGrid">
+                <div class="empty-state" id="fileEmpty">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    </div>
+                    <span class="empty-text">No items to show</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="bottom-bar">
+            <button class="action-btn danger-outline" id="hideSelectedBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                Hide Selected
+            </button>
+            <button class="action-btn primary" id="showAllHiddenBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View All Hidden
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-title" id="modalTitle">File Options</div>
+            <div class="modal-option" id="modalHideBtn">Hide from Gallery</div>
+            <div class="modal-option" id="modalUnhideBtn">Unhide / Restore</div>
+            <div class="modal-option danger" id="modalDeleteBtn">Delete Permanently</div>
+            <div class="modal-cancel" id="modalCancel">Cancel</div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- JavaScript -->
+    <script>
+        (function() {
+            // ============ APP STATE ============
+            const state = {
+                darkMode: false,
+                currentTab: 'pictures',
+                selectedFile: null,
+                files: {
+                    pictures: [],
+                    videos: [],
+                    files: []
+                },
+                hiddenFolders: [],
+                storageInfo: { used: 0, total: 0, usedGB: '0', totalGB: '0' }
+            };
+
+            // ============ DOM REFS ============
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            const dom = {
+                body: document.body,
+                darkToggle: $('#darkToggle'),
+                uploadBtn: $('#uploadBtn'),
+                storageChip: $('#storageChip'),
+                storageText: $('#storageText'),
+                notchTabBar: $('#notchTabBar'),
+                contentArea: $('#contentArea'),
+                fileGrid: $('#fileGrid'),
+                hiddenFoldersList: $('#hiddenFoldersList'),
+                hiddenEmpty: $('#hiddenEmpty'),
+                fileEmpty: $('#fileEmpty'),
+                hiddenCount: $('#hiddenCount'),
+                visibleCount: $('#visibleCount'),
+                currentTabLabel: $('#currentTabLabel'),
+                countPictures: $('#countPictures'),
+                countVideos: $('#countVideos'),
+                countFiles: $('#countFiles'),
+                hideSelectedBtn: $('#hideSelectedBtn'),
+                showAllHiddenBtn: $('#showAllHiddenBtn'),
+                modalOverlay: $('#modalOverlay'),
+                modalTitle: $('#modalTitle'),
+                modalHideBtn: $('#modalHideBtn'),
+                modalUnhideBtn: $('#modalUnhideBtn'),
+                modalDeleteBtn: $('#modalDeleteBtn'),
+                modalCancel: $('#modalCancel'),
+                toast: $('#toast')
+            };
+
+            // ============ TOAST ============
+            let toastTimer;
+
+            function showToast(msg) {
+                clearTimeout(toastTimer);
+                dom.toast.textContent = msg;
+                dom.toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    dom.toast.classList.remove('show');
+                }, 2200);
+            }
+
+            // ============ DARK MODE ============
+            function applyDarkMode(enabled) {
+                state.darkMode = enabled;
+                if (enabled) {
+                    dom.body.classList.add('deep-dark');
+                } else {
+                    dom.body.classList.remove('deep-dark');
+                }
+                try {
+                    localStorage.setItem('vishux-dark-mode', enabled ? '1' : '0');
+                } catch (e) {}
+            }
+
+            dom.darkToggle.addEventListener('click', () => {
+                applyDarkMode(!state.darkMode);
+            });
+
+            // Load saved preference
+            try {
+                const saved = localStorage.getItem('vishux-dark-mode');
+                if (saved === '1') applyDarkMode(true);
+            } catch (e) {}
+
+            // ============ TAB SWITCHING ============
+            dom.notchTabBar.addEventListener('click', (e) => {
+                const tab = e.target.closest('.notch-tab');
+                if (!tab) return;
+                const tabName = tab.dataset.tab;
+                if (tabName && tabName !== state.currentTab) {
+                    state.currentTab = tabName;
+                    updateTabUI();
+                    renderFileGrid();
+                }
+            });
+
+            function updateTabUI() {
+                $$('.notch-tab').forEach(t => t.classList.remove('active'));
+                const activeTab = document.querySelector(`.notch-tab[data-tab="${state.currentTab}"]`);
+                if (activeTab) activeTab.classList.add('active');
+                const labelMap = { pictures: 'Pictures', videos: 'Videos', files: 'Files' };
+                dom.currentTabLabel.textContent = labelMap[state.currentTab] || 'Items';
+                updateCounts();
+            }
+
+            // ============ STORAGE INFO ============
+            function updateStorageInfo() {
+                // Estimate storage (in a real app this comes from Android)
+                let usedBytes = 0;
+                ['pictures', 'videos', 'files'].forEach(cat => {
+                    state.files[cat].forEach(f => { usedBytes += f.size || 0; });
+                });
+                state.hiddenFolders.forEach(f => { usedBytes += f.size || 0; });
+
+                const totalBytes = 64 * 1024 * 1024 * 1024; // Simulated 64GB
+                const usedGB = (usedBytes / (1024 * 1024 * 1024)).toFixed(1);
+                const totalGB = (totalBytes / (1024 * 1024 * 1024)).toFixed(1);
+
+                state.storageInfo = {
+                    used: usedBytes,
+                    total: totalBytes,
+                    usedGB: usedGB,
+                    totalGB: totalGB
+                };
+
+                dom.storageText.textContent = `${usedGB} GB / ${totalGB} GB`;
+
+                // Color coding
+                const ratio = usedBytes / totalBytes;
+                dom.storageChip.classList.remove('warning', 'danger');
+                if (ratio > 0.85) dom.storageChip.classList.add('danger');
+                else if (ratio > 0.6) dom.storageChip.classList.add('warning');
+            }
+
+            // ============ COUNT UPDATES ============
+            function updateCounts() {
+                dom.countPictures.textContent = state.files.pictures.length;
+                dom.countVideos.textContent = state.files.videos.length;
+                dom.countFiles.textContent = state.files.files.length;
+                dom.hiddenCount.textContent = state.hiddenFolders.length + ' hidden';
+                const currentFiles = state.files[state.currentTab] || [];
+                dom.visibleCount.textContent = currentFiles.length + ' items';
+            }
+
+            // ============ RENDER FILE GRID ============
+            function getFileIcon(category) {
+                if (category === 'pictures') {
+                    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+                } else if (category === 'videos') {
+                    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>`;
+                } else {
+                    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+                }
+            }
+
+            function formatFileSize(bytes) {
+                if (!bytes || bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+
+            function renderFileGrid() {
+                const files = state.files[state.currentTab] || [];
+                dom.fileGrid.innerHTML = '';
+
+                if (files.length === 0) {
+                    dom.fileGrid.innerHTML = `
+                        <div class="empty-state" id="fileEmpty" style="grid-column:1/-1;">
+                            <div class="empty-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            </div>
+                            <span class="empty-text">No ${state.currentTab} to show</span>
+                        </div>`;
+                    dom.fileEmpty = $('#fileEmpty');
+                } else {
+                    files.forEach((file, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'file-card';
+                        card.dataset.index = index;
+                        card.dataset.category = state.currentTab;
+                        card.innerHTML = `
+                            <div class="hide-indicator">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                            </div>
+                            <div class="file-thumb">
+                                ${getFileIcon(state.currentTab)}
+                            </div>
+                            <span class="file-name">${file.name || 'Unknown'}</span>
+                            <span class="file-meta">${formatFileSize(file.size)}</span>
+                        `;
+                        card.addEventListener('click', () => {
+                            state.selectedFile = { ...file, category: state.currentTab,
+                                index };
+                            openFileModal();
+                        });
+                        dom.fileGrid.appendChild(card);
+                    });
+                }
+                dom.fileEmpty = $('#fileEmpty');
+                updateCounts();
+                updateStorageInfo();
+            }
+
+            function renderHiddenFolders() {
+                dom.hiddenFoldersList.innerHTML = '';
+                if (state.hiddenFolders.length === 0) {
+                    dom.hiddenFoldersList.innerHTML = `
+                        <div class="empty-state" id="hiddenEmpty">
+                            <div class="empty-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                            </div>
+                            <span class="empty-text">No hidden folders yet</span>
+                        </div>`;
+                    dom.hiddenEmpty = $('#hiddenEmpty');
+                } else {
+                    state.hiddenFolders.forEach((folder, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'file-list-item';
+                        item.innerHTML = `
+                            <div class="fl-thumb">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <div class="fl-info">
+                                <div class="fl-name">${folder.name || 'Hidden Folder'}</div>
+                                <div class="fl-meta">${formatFileSize(folder.size)} &middot; ${folder.fileCount || 0} files</div>
+                            </div>
+                            <div class="fl-action">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                            </div>
+                        `;
+                        item.addEventListener('click', () => {
+                            state.selectedFile = { ...folder, category: 'hidden',
+                                index, isHidden: true };
+                            openFileModal();
+                        });
+                        dom.hiddenFoldersList.appendChild(item);
+                    });
+                }
+                dom.hiddenEmpty = $('#hiddenEmpty');
+                updateCounts();
+                updateStorageInfo();
+            }
+
+            // ============ MODAL ============
+            function openFileModal() {
+                const file = state.selectedFile;
+                if (!file) return;
+                dom.modalTitle.textContent = file.name || 'File Options';
+                dom.modalOverlay.classList.add('active');
+
+                if (file.isHidden) {
+                    dom.modalHideBtn.style.display = 'none';
+                    dom.modalUnhideBtn.style.display = 'block';
+                    dom.modalUnhideBtn.textContent = 'Unhide / Restore';
+                } else {
+                    dom.modalHideBtn.style.display = 'block';
+                    dom.modalUnhideBtn.style.display = 'none';
+                    dom.modalHideBtn.textContent = 'Hide from Gallery';
+                }
+            }
+
+            function closeModal() {
+                dom.modalOverlay.classList.remove('active');
+                state.selectedFile = null;
+            }
+
+            dom.modalCancel.addEventListener('click', closeModal);
+            dom.modalOverlay.addEventListener('click', (e) => {
+                if (e.target === dom.modalOverlay) closeModal();
+            });
+
+            // Hide file
+            dom.modalHideBtn.addEventListener('click', () => {
+                const file = state.selectedFile;
+                if (!file || file.isHidden) return;
+                hideFile(file);
+                closeModal();
+            });
+
+            // Unhide file
+            dom.modalUnhideBtn.addEventListener('click', () => {
+                const file = state.selectedFile;
+                if (!file || !file.isHidden) return;
+                unhideFile(file);
+                closeModal();
+            });
+
+            // Delete file
+            dom.modalDeleteBtn.addEventListener('click', () => {
+                const file = state.selectedFile;
+                if (!file) return;
+                deleteFilePermanently(file);
+                closeModal();
+            });
+
+            function hideFile(file) {
+                if (file.category === 'hidden') return;
+                const category = file.category;
+                const index = file.index;
+                if (category && state.files[category]) {
+                    const removed = state.files[category].splice(index, 1)[0];
+                    if (removed) {
+                        removed.hiddenAt = Date.now();
+                        removed.originalCategory = category;
+                        // Create or add to hidden folder
+                        let hiddenFolder = state.hiddenFolders.find(f => f.name === 'Hidden ' + (
+                            category.charAt(0).toUpperCase() + category.slice(1)));
+                        if (!hiddenFolder) {
+                            hiddenFolder = {
+                                name: 'Hidden ' + (category.charAt(0).toUpperCase() + category.slice(
+                                    1)),
+                                size: 0,
+                                fileCount: 0,
+                                files: []
+                            };
+                            state.hiddenFolders.push(hiddenFolder);
+                        }
+                        hiddenFolder.files.push(removed);
+                        hiddenFolder.fileCount = hiddenFolder.files.length;
+                        hiddenFolder.size = hiddenFolder.files.reduce((acc, f) => acc + (f.size || 0), 0);
+                        showToast('File hidden successfully');
+                        refreshAll();
+                    }
+                }
+            }
+
+            function unhideFile(file) {
+                if (!file.isHidden) return;
+                const index = file.index;
+                if (state.hiddenFolders[file.index] !== undefined && file.name && file.files === undefined) {
+                    // It's a folder entry itself
+                    const folder = state.hiddenFolders.splice(file.index, 1)[0];
+                    if (folder && folder.files) {
+                        folder.files.forEach(f => {
+                            const cat = f.originalCategory || 'files';
+                            if (state.files[cat]) {
+                                state.files[cat].push(f);
+                            }
+                        });
+                    }
+                    showToast('Folder restored');
+                } else if (file.files && Array.isArray(file.files)) {
+                    // Unhide entire hidden folder
+                    const folder = state.hiddenFolders.splice(file.index, 1)[0];
+                    if (folder && folder.files) {
+                        folder.files.forEach(f => {
+                            const cat = f.originalCategory || 'files';
+                            if (state.files[cat]) state.files[cat].push(f);
+                        });
+                    }
+                    showToast('All files restored');
+                }
+                refreshAll();
+            }
+
+            function deleteFilePermanently(file) {
+                if (file.isHidden && file.files && Array.isArray(file.files)) {
+                    state.hiddenFolders.splice(file.index, 1);
+                    showToast('Hidden folder deleted');
+                } else if (file.isHidden) {
+                    state.hiddenFolders.splice(file.index, 1);
+                    showToast('File deleted permanently');
+                } else if (file.category && state.files[file.category]) {
+                    state.files[file.category].splice(file.index, 1);
+                    showToast('File deleted permanently');
+                }
+                refreshAll();
+            }
+
+            function refreshAll() {
+                renderFileGrid();
+                renderHiddenFolders();
+                updateCounts();
+                updateStorageInfo();
+            }
+
+            // ============ HIDE SELECTED (bulk) ============
+            dom.hideSelectedBtn.addEventListener('click', () => {
+                const files = state.files[state.currentTab] || [];
+                if (files.length === 0) {
+                    showToast('No files to hide');
+                    return;
+                }
+                // Hide the first file as a demo (in real app would support multi-select)
+                const file = files[0];
+                hideFile({ ...file, category: state.currentTab, index: 0 });
+            });
+
+            // ============ VIEW ALL HIDDEN ============
+            dom.showAllHiddenBtn.addEventListener('click', () => {
+                if (state.hiddenFolders.length === 0) {
+                    showToast('No hidden files');
+                    return;
+                }
+                // Scroll to hidden section
+                dom.hiddenFoldersList.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Flash effect
+                dom.hiddenFoldersList.style.boxShadow = '0 0 0 4px var(--accent-soft)';
+                setTimeout(() => {
+                    dom.hiddenFoldersList.style.boxShadow = '';
+                }, 1500);
+                showToast('Showing ' + state.hiddenFolders.length + ' hidden folder(s)');
+            });
+
+            // ============ UPLOAD (simulated) ============
+            dom.uploadBtn.addEventListener('click', () => {
+                // Simulate file upload with random demo files
+                const demoFiles = [
+                    { name: 'IMG_' + Date.now() + '.jpg', size: Math.floor(Math.random() * 8000000) +
+                            500000, category: 'pictures' },
+                    { name: 'VID_' + (Date.now() - 1000) + '.mp4', size: Math.floor(Math.random() *
+                            50000000) + 2000000, category: 'videos' },
+                    { name: 'Document_' + (Date.now() - 2000) + '.pdf', size: Math.floor(Math.random() *
+                            3000000) + 100000, category: 'files' },
+                ];
+                const randomFile = demoFiles[Math.floor(Math.random() * demoFiles.length)];
+                const cat = randomFile.category;
+                if (state.files[cat]) {
+                    state.files[cat].unshift(randomFile);
+                    if (state.currentTab !== cat) {
+                        state.currentTab = cat;
+                        updateTabUI();
+                    }
+                    refreshAll();
+                    showToast('File uploaded: ' + randomFile.name);
+                }
+            });
+
+            // ============ INITIALIZE DEMO DATA ============
+            function initDemoData() {
+                state.files.pictures = [
+                    { name: 'Photo_Beach.jpg', size: 3200000 },
+                    { name: 'Sunset_View.png', size: 5600000 },
+                    { name: 'Family_Pic.jpg', size: 2100000 },
+                    { name: 'Screenshot_01.png', size: 890000 },
+                    { name: 'Wallpaper_Blue.jpg', size: 4400000 },
+                ];
+                state.files.videos = [
+                    { name: 'Concert_Clip.mp4', size: 28000000 },
+                    { name: 'Tutorial_Screen.mp4', size: 45000000 },
+                    { name: 'SlowMo_Birds.mp4', size: 18000000 },
+                ];
+                state.files.files = [
+                    { name: 'Project_Notes.pdf', size: 450000 },
+                    { name: 'Budget_Sheet.xlsx', size: 120000 },
+                    { name: 'Resume_Final.docx', size: 85000 },
+                    { name: 'Archive_2024.zip', size: 15000000 },
+                ];
+                state.hiddenFolders = [{
+                    name: 'Hidden Pictures',
+                    size: 4200000,
+                    fileCount: 2,
+                    files: [
+                        { name: 'Private_Shot.jpg', size: 2100000, originalCategory: 'pictures' },
+                        { name: 'Confidential.png', size: 2100000, originalCategory: 'pictures' },
+                    ]
+                }];
+                refreshAll();
+            }
+
+            // ============ KEYBOARD SHORTCUTS ============
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'd' && e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    applyDarkMode(!state.darkMode);
+                }
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            // ============ INIT ============
+            initDemoData();
+            updateTabUI();
+            renderFileGrid();
+            renderHiddenFolders();
+            updateStorageInfo();
+
+            console.log('%c VishuX Files %c Ready ',
+                'font-size:18px;font-weight:bold;color:#007aff;',
+                'font-size:12px;color:#666;');
+            console.log('%c iOS Liquid Glass UI %c|%c Deep Dark Mode %c|%c Hide Folders ',
+                'color:#555;', 'color:#ccc;', 'color:#333;', 'color:#ccc;', 'color:#555;');
+        })();
+    </script>
+</body>
+</html>

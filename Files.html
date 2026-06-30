@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>VishuX Files</title>
+    <style>
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #e8ecf0;
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-bg-strong: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: rgba(0, 0, 0, 0.06);
+            --text-primary: #1a1a2e;
+            --text-secondary: #555;
+            --text-tertiary: #888;
+            --accent: #007aff;
+            --accent-soft: #e8f2ff;
+            --tab-active-bg: rgba(255, 255, 255, 0.85);
+            --tab-inactive-text: #999;
+            --card-bg: rgba(255, 255, 255, 0.5);
+            --card-hover: rgba(255, 255, 255, 0.7);
+            --divider: rgba(0, 0, 0, 0.08);
+            --notch-bg: rgba(255, 255, 255, 0.7);
+            --button-glass: rgba(255, 255, 255, 0.6);
+            --badge-bg: rgba(0, 122, 255, 0.1);
+            --icon-fill: #333;
+            --danger: #ff3b30;
+            --success: #34c759;
+            --warning: #ff9500;
+            --backdrop-blur: 24px;
+            --border-radius-lg: 28px;
+            --border-radius-md: 18px;
+            --border-radius-sm: 12px;
+            --transition-speed: 0.3s;
+        }
+        body.deep-dark {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --glass-bg: rgba(28, 28, 40, 0.65);
+            --glass-bg-strong: rgba(32, 32, 48, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: rgba(0, 0, 0, 0.4);
+            --text-primary: #f0f0f5;
+            --text-secondary: #b0b0c0;
+            --text-tertiary: #777;
+            --accent: #4da6ff;
+            --accent-soft: rgba(77, 166, 255, 0.12);
+            --tab-active-bg: rgba(40, 40, 60, 0.85);
+            --tab-inactive-text: #666;
+            --card-bg: rgba(28, 28, 42, 0.55);
+            --card-hover: rgba(36, 36, 54, 0.75);
+            --divider: rgba(255, 255, 255, 0.06);
+            --notch-bg: rgba(20, 20, 32, 0.75);
+            --button-glass: rgba(40, 40, 60, 0.65);
+            --badge-bg: rgba(77, 166, 255, 0.15);
+            --icon-fill: #e0e0e8;
+            --danger: #ff453a;
+            --success: #30d158;
+            --warning: #ff9f0a;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-orb.orb-1 {
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, #007aff 0%, transparent 70%);
+            top: -80px;
+            right: -60px;
+        }
+        .bg-orb.orb-2 {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, #5856d6 0%, transparent 70%);
+            bottom: -60px;
+            left: -70px;
+        }
+        .bg-orb.orb-3 {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, #ff9500 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        body.deep-dark .bg-orb {
+            opacity: 0.1;
+        }
+        .app-container {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 0 16px;
+            padding-top: env(safe-area-inset-top, 16px);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 4px;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
+        }
+        .app-title .dot {
+            color: var(--accent);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .glass-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--button-glass);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--icon-fill);
+            box-shadow: 0 2px 8px var(--glass-shadow);
+            position: relative;
+        }
+        .glass-btn:active {
+            transform: scale(0.93);
+            background: var(--card-hover);
+        }
+        .glass-btn svg {
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+        }
+        .glass-btn.upload-btn {
+            width: 42px;
+            height: 42px;
+            background: var(--accent-soft);
+            border-color: rgba(0, 122, 255, 0.25);
+            color: var(--accent);
+        }
+        .glass-btn.dark-toggle .icon-sun,
+        .glass-btn.dark-toggle .icon-moon {
+            position: absolute;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .glass-btn.dark-toggle .icon-sun {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .glass-btn.dark-toggle .icon-moon {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.7);
+        }
+        body.deep-dark .glass-btn.dark-toggle .icon-sun {
+            opacity: 0;
+            transform: rotate(90deg) scale(0.7);
+        }
+        body.deep-dark .glass-btn.dark-toggle .icon-moon {
+            opacity: 1;
+            transform: rotate(0deg) scale(1);
+        }
+        .storage-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border: 1px solid var(--glass-border);
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            box-shadow: 0 1px 4px var(--glass-shadow);
+        }
+        .storage-chip .chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+            flex-shrink: 0;
+        }
+        .storage-chip.warning .chip-dot {
+            background: var(--warning);
+        }
+        .storage-chip.danger .chip-dot {
+            background: var(--danger);
+        }
+        .notch-tab-bar {
+            display: flex;
+            background: var(--notch-bg);
+            backdrop-filter: blur(var(--backdrop-blur));
+            -webkit-backdrop-filter: blur(var(--backdrop-blur));
+            border-radius: var(--border-radius-lg);
+            padding: 5px;
+            margin: 8px 0 14px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 16px var(--glass-shadow);
+        }
+        .notch-tab {
+            flex: 1;
+            text-align: center;
+            padding: 11px 8px;
+            border-radius: 22px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            color: var(--tab-inactive-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .notch-tab.active {
+            background: var(--tab-active-bg);
+            color: var(--accent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            font-weight: 700;
+        }
+        .notch-tab .tab-icon {
+            width: 16px;
+            height: 16px;
+        }
+        .notch-tab .tab-count {
+            font-size: 0.65rem;
+            background: var(--badge-bg);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        .content-area::-webkit-scrollbar {
+            display: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 6px 12px;
+            flex-shrink: 0;
+        }
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .section-title .dot-indicator {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .section-badge {
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            background: var(--card-bg);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .file-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: var(--border-radius-md);
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.2s;
+            box-shadow: 0 2px 10px var(--glass-shadow);
+            position: relative;
+            overflow: visible;
+            cursor: pointer;
+        }
+        .file-card:active {
+            transform: scale(0.96);
+            background: var(--card-hover);
+        }
+        .file-card .file-thumb {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: var(--border-radius-sm);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .file-card .file-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .file-card .file-thumb .thumb-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-sm);
+        }
+        .file-card .file-thumb svg {
+            width: 32px;
+            height: 32px;
+            opacity: 0.55;
+        }
+        .file-card .file-name {
+            font-size: 0.68rem;
+            font-weight: 500;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .file-card .file-meta {
+            font-size: 0.6rem;
+            color: var(--text-tertiary);
+            margin-top: -2px;
+        }
+
+        /* No longer needed: options-btn is hidden, long‑press instead */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 20px;
+            text-align: center;
+            gap: 12px;
+            grid-column: 1 / -1;
+        }
+        .empty-state .empty-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 16px var(--glass-shadow);
+        }
+        .empty-state .empty-icon svg {
+            width: 32px;
+            height: 32px;
+            opacity: 0.5;
+        }
+        .empty-text {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 100;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-sheet {
+            width: 100%;
+            max-width: 500px;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px 24px 0 0;
+            padding: 20px 20px 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+            transform: translateY(100%);
+            transition: 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .modal-overlay.active .modal-sheet {
+            transform: translateY(0);
+        }
+        .modal-handle {
+            width: 36px;
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(128, 128, 128, 0.4);
+            margin: 0 auto 16px;
+        }
+        .modal-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 14px;
+            padding: 0 8px;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+        .modal-option {
+            padding: 14px 16px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: all 0.15s;
+            font-size: 0.9rem;
+        }
+        .modal-option:active {
+            background: var(--card-hover);
+            transform: scale(0.97);
+        }
+        .modal-option.danger {
+            color: var(--danger);
+            border-color: rgba(255, 59, 48, 0.3);
+            font-weight: 600;
+        }
+        .modal-option.save-option {
+            color: var(--accent);
+            border-color: rgba(0, 122, 255, 0.25);
+            font-weight: 600;
+        }
+        .modal-cancel {
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+            margin-top: 4px;
+            border-radius: var(--border-radius-sm);
+            transition: background 0.15s;
+        }
+        .modal-cancel:active {
+            background: var(--card-bg);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 22px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            z-index: 200;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            transition: 0.35s;
+            color: var(--text-primary);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .viewer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .viewer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .viewer-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .viewer-close {
+            position: absolute;
+            top: max(20px, env(safe-area-inset-top, 20px));
+            right: 20px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--button-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--icon-fill);
+            font-size: 22px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            line-height: 1;
+            transition: transform 0.15s;
+        }
+        .viewer-close:active {
+            transform: scale(0.9);
+        }
+        .viewer-media {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+        .viewer-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+            background: #fff;
+        }
+        .viewer-text {
+            width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            padding: 20px;
+            background: var(--glass-bg-strong);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 18px;
+            color: var(--text-primary);
+            font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 0.8rem;
+            line-height: 1.5;
+        }
+        .viewer-unsupported {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-primary);
+            text-align: center;
+            padding: 30px;
+        }
+        .viewer-unsupported p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .viewer-unsupported .btn {
+            padding: 12px 24px;
+            border-radius: 30px;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.15s;
+        }
+        .viewer-unsupported .btn:active {
+            opacity: 0.8;
+        }
+
+        @media (min-width: 420px) {
+            .file-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+            }
+        }
+        @media (max-width: 340px) {
+            .file-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .notch-tab {
+                font-size: 0.7rem;
+                padding: 9px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <div class="app-container">
+        <div class="header">
+            <span class="app-title">VishuX<span class="dot">.</span> Files</span>
+            <div class="header-actions">
+                <div class="storage-chip" id="storageChip">
+                    <span class="chip-dot"></span>
+                    <span id="storageText">0.0 GB / 64 GB</span>
+                </div>
+                <button class="glass-btn dark-toggle" id="darkToggle" aria-label="Deep dark mode">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <button class="glass-btn upload-btn" id="uploadBtn" aria-label="Add files to vault">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="notch-tab-bar" id="notchTabBar">
+            <div class="notch-tab active" data-tab="pictures">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Pictures <span class="tab-count" id="countPictures">0</span>
+            </div>
+            <div class="notch-tab" data-tab="videos">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                Videos <span class="tab-count" id="countVideos">0</span>
+            </div>
+            <div class="notch-tab" data-tab="files">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                Files <span class="tab-count" id="countFiles">0</span>
+            </div>
+        </div>
+
+        <div class="content-area" id="contentArea">
+            <div class="section-header">
+                <span class="section-title">
+                    <span class="dot-indicator"></span> <span id="currentTabLabel">Pictures</span>
+                </span>
+                <span class="section-badge" id="visibleCount">0 items</span>
+            </div>
+            <div class="file-grid" id="fileGrid"></div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" multiple accept="*/*" style="display:none;">
+
+    <!-- Options bottom sheet -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-title" id="modalTitle">File Options</div>
+            <div class="modal-option" id="modalOpenBtn">🔍 Open / View</div>
+            <div class="modal-option save-option" id="modalSaveBtn">💾 Save to device</div>
+            <div class="modal-option danger" id="modalDeleteBtn">🗑 Delete from vault</div>
+            <div class="modal-cancel" id="modalCancel">Cancel</div>
+        </div>
+    </div>
+
+    <!-- Fullscreen viewer -->
+    <div class="viewer-overlay" id="viewerOverlay">
+        <div class="viewer-close" id="viewerClose" aria-label="Close viewer">✕</div>
+        <div class="viewer-content" id="viewerContent"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            const $ = s => document.querySelector(s);
+            const $$ = s => document.querySelectorAll(s);
+
+            const state = {
+                darkMode: false,
+                currentTab: 'pictures',
+                selectedFile: null,
+                files: { pictures: [], videos: [], files: [] },
+                longPressTimer: null,
+                longPressTarget: null
+            };
+
+            const dom = {
+                body: document.body,
+                darkToggle: $('#darkToggle'),
+                uploadBtn: $('#uploadBtn'),
+                fileInput: $('#fileInput'),
+                storageChip: $('#storageChip'),
+                storageText: $('#storageText'),
+                notchTabBar: $('#notchTabBar'),
+                fileGrid: $('#fileGrid'),
+                visibleCount: $('#visibleCount'),
+                currentTabLabel: $('#currentTabLabel'),
+                countPictures: $('#countPictures'),
+                countVideos: $('#countVideos'),
+                countFiles: $('#countFiles'),
+                modalOverlay: $('#modalOverlay'),
+                modalTitle: $('#modalTitle'),
+                modalOpenBtn: $('#modalOpenBtn'),
+                modalSaveBtn: $('#modalSaveBtn'),
+                modalDeleteBtn: $('#modalDeleteBtn'),
+                modalCancel: $('#modalCancel'),
+                viewerOverlay: $('#viewerOverlay'),
+                viewerContent: $('#viewerContent'),
+                viewerClose: $('#viewerClose'),
+                toast: $('#toast')
+            };
+
+            let toastTimer;
+            function showToast(msg) {
+                clearTimeout(toastTimer);
+                dom.toast.textContent = msg;
+                dom.toast.classList.add('show');
+                toastTimer = setTimeout(() => dom.toast.classList.remove('show'), 2200);
+            }
+
+            // ── Dark mode ────────────────────────────
+            function applyDarkMode(enabled) {
+                state.darkMode = enabled;
+                dom.body.classList.toggle('deep-dark', enabled);
+                try { localStorage.setItem('vishux-dark-mode', enabled ? '1' : '0'); } catch (e) {}
+            }
+            dom.darkToggle.addEventListener('click', () => applyDarkMode(!state.darkMode));
+            try {
+                if (localStorage.getItem('vishux-dark-mode') === '1') applyDarkMode(true);
+            } catch (e) {}
+
+            // ── Tab switching ────────────────────────
+            dom.notchTabBar.addEventListener('click', e => {
+                const tab = e.target.closest('.notch-tab');
+                if (!tab) return;
+                const tabName = tab.dataset.tab;
+                if (tabName && tabName !== state.currentTab) {
+                    state.currentTab = tabName;
+                    updateTabUI();
+                    renderFileGrid();
+                }
+            });
+
+            function updateTabUI() {
+                $$('.notch-tab').forEach(t => t.classList.remove('active'));
+                const active = document.querySelector(`.notch-tab[data-tab="${state.currentTab}"]`);
+                if (active) active.classList.add('active');
+                dom.currentTabLabel.textContent =
+                    state.currentTab.charAt(0).toUpperCase() + state.currentTab.slice(1);
+                updateCounts();
+            }
+
+            // ── Helpers ──────────────────────────────
+            function getCategoryFromFile(file) {
+                if (file.type.startsWith('image/')) return 'pictures';
+                if (file.type.startsWith('video/')) return 'videos';
+                return 'files';
+            }
+
+            function formatFileSize(bytes) {
+                if (!bytes || bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+
+            function revokeFileURL(fileObj) {
+                if (fileObj?.url?.startsWith('blob:')) {
+                    URL.revokeObjectURL(fileObj.url);
+                    fileObj.url = null;
+                }
+            }
+
+            function getFileExtension(name) {
+                return (name || '').split('.').pop().toLowerCase();
+            }
+
+            function getFileType(file) {
+                const ext = getFileExtension(file.name);
+                if (file.blob && file.blob.type) {
+                    if (file.blob.type.startsWith('image/')) return 'image';
+                    if (file.blob.type.startsWith('video/')) return 'video';
+                    if (file.blob.type.startsWith('audio/')) return 'audio';
+                    if (file.blob.type === 'application/pdf') return 'pdf';
+                }
+                if (/^(jpg|jpeg|png|gif|webp|bmp|heic|heif)$/i.test(ext)) return 'image';
+                if (/^(mp4|mov|avi|mkv|webm)$/i.test(ext)) return 'video';
+                if (/^(mp3|wav|ogg|aac|flac)$/i.test(ext)) return 'audio';
+                if (ext === 'pdf') return 'pdf';
+                if (/^(txt|log|csv|md|json|xml|yaml|yml)$/i.test(ext)) return 'text';
+                if (/^(html|htm)$/i.test(ext)) return 'html';
+                if (/^(doc|docx|xls|xlsx|ppt|pptx)$/i.test(ext)) return 'office';
+                return 'other';
+            }
+
+            function getFileIconSVG(category) {
+                if (category === 'pictures') {
+                    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+                }
+                if (category === 'videos') {
+                    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>`;
+                }
+                return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+            }
+
+            function getPlaceholderStyle(index) {
+                const palettes = [
+                    ['#fce4ec', '#f8bbd0'],
+                    ['#e8f5e9', '#c8e6c9'],
+                    ['#e3f2fd', '#bbdefb'],
+                    ['#fff3e0', '#ffe0b2'],
+                    ['#f3e5f5', '#e1bee7'],
+                    ['#e0f7fa', '#b2ebf2'],
+                    ['#fff8e1', '#ffecb3'],
+                    ['#fbe9e7', '#ffccbc'],
+                    ['#e8eaf6', '#c5cae9'],
+                    ['#f1f8e9', '#dcedc8'],
+                ];
+                const palette = palettes[index % palettes.length];
+                return `background: linear-gradient(135deg, ${palette[0]} 0%, ${palette[1]} 100%);`;
+            }
+
+            // ── Long‑press handler ────────────────────
+            function startLongPress(e, file, index) {
+                // Only for touch or mouse events
+                if (e.type === 'touchstart' || e.type === 'mousedown') {
+                    clearLongPress();
+                    state.longPressTimer = setTimeout(() => {
+                        // Prevent accidental tap after long press
+                        e.preventDefault();
+                        state.selectedFile = { ...file, realIndex: index, category: state.currentTab };
+                        openOptionsModal();
+                        clearLongPress();
+                    }, 600);
+                    state.longPressTarget = e.currentTarget;
+                }
+            }
+
+            function cancelLongPress() {
+                clearLongPress();
+            }
+
+            function clearLongPress() {
+                if (state.longPressTimer) {
+                    clearTimeout(state.longPressTimer);
+                    state.longPressTimer = null;
+                }
+                state.longPressTarget = null;
+            }
+
+            // ── Render grid ──────────────────────────
+            function renderFileGrid() {
+                const files = state.files[state.currentTab] || [];
+                dom.fileGrid.innerHTML = '';
+
+                if (files.length === 0) {
+                    dom.fileGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            </div>
+                            <span class="empty-text">No files in vault</span>
+                        </div>`;
+                } else {
+                    files.forEach((file, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'file-card';
+                        card.setAttribute('data-index', index);
+
+                        let thumbInner;
+                        if (file.url && getFileType(file) === 'image') {
+                            thumbInner = `<img src="${file.url}" alt="${escapeAttr(file.name)}" loading="lazy">`;
+                        } else if (file.url && getFileType(file) === 'video') {
+                            thumbInner =
+                                `<div class="thumb-placeholder" style="${getPlaceholderStyle(index)}">${getFileIconSVG('videos')}</div>`;
+                        } else if (file.placeholderStyle) {
+                            thumbInner =
+                                `<div class="thumb-placeholder" style="${file.placeholderStyle}">${getFileIconSVG(state.currentTab)}</div>`;
+                        } else {
+                            thumbInner = getFileIconSVG(state.currentTab);
+                        }
+
+                        card.innerHTML = `
+                            <div class="file-thumb">${thumbInner}</div>
+                            <span class="file-name">${escapeHtml(file.name || 'Unknown')}</span>
+                            <span class="file-meta">${formatFileSize(file.size)}</span>
+                        `;
+
+                        // Tap to view
+                        card.addEventListener('click', (e) => {
+                            // If a long press is detected, the click will be prevented by long press handler
+                            if (state.longPressTimer) return;
+                            openViewer(file);
+                        });
+
+                        // Long press to open options
+                        card.addEventListener('touchstart', (e) => startLongPress(e, file, index), { passive: false });
+                        card.addEventListener('touchend', cancelLongPress);
+                        card.addEventListener('touchmove', cancelLongPress);
+                        card.addEventListener('touchcancel', cancelLongPress);
+                        card.addEventListener('mousedown', (e) => startLongPress(e, file, index));
+                        card.addEventListener('mouseup', cancelLongPress);
+                        card.addEventListener('mouseleave', cancelLongPress);
+
+                        dom.fileGrid.appendChild(card);
+                    });
+                }
+                updateCounts();
+                updateStorageInfo();
+            }
+
+            function updateCounts() {
+                dom.countPictures.textContent = state.files.pictures.length;
+                dom.countVideos.textContent = state.files.videos.length;
+                dom.countFiles.textContent = state.files.files.length;
+                const currentFiles = state.files[state.currentTab] || [];
+                dom.visibleCount.textContent = currentFiles.length + ' item' + (currentFiles.length !== 1 ? 's' : '');
+            }
+
+            function updateStorageInfo() {
+                let usedBytes = 0;
+                ['pictures', 'videos', 'files'].forEach(cat => {
+                    state.files[cat].forEach(f => usedBytes += f.size || 0);
+                });
+                const totalBytes = 64 * 1024 * 1024 * 1024;
+                const usedGB = (usedBytes / (1024 * 1024 * 1024)).toFixed(1);
+                const totalGB = (totalBytes / (1024 * 1024 * 1024)).toFixed(1);
+                dom.storageText.textContent = `${usedGB} GB / ${totalGB} GB`;
+                const ratio = usedBytes / totalBytes;
+                dom.storageChip.classList.remove('warning', 'danger');
+                if (ratio > 0.85) dom.storageChip.classList.add('danger');
+                else if (ratio > 0.6) dom.storageChip.classList.add('warning');
+            }
+
+            // ── Options modal ────────────────────────
+            function openOptionsModal() {
+                const file = state.selectedFile;
+                if (!file) return;
+                dom.modalTitle.textContent = file.name || 'File';
+                dom.modalOverlay.classList.add('active');
+            }
+
+            function closeOptionsModal() {
+                dom.modalOverlay.classList.remove('active');
+                state.selectedFile = null;
+            }
+            dom.modalCancel.addEventListener('click', closeOptionsModal);
+            dom.modalOverlay.addEventListener('click', e => {
+                if (e.target === dom.modalOverlay) closeOptionsModal();
+            });
+
+            dom.modalOpenBtn.addEventListener('click', () => {
+                const file = state.selectedFile;
+                if (!file) return;
+                closeOptionsModal();
+                openViewer(file);
+            });
+
+            dom.modalSaveBtn.addEventListener('click', () => {
+                const file = state.selectedFile;
+                if (!file) return;
+                const success = saveToDevice(file);
+                showToast(success ? 'Saved to device' : 'Demo file – upload real files to save');
+                closeOptionsModal();
+            });
+
+            dom.modalDeleteBtn.addEventListener('click', () => {
+                const file = state.selectedFile;
+                if (!file) return;
+                const arr = state.files[file.category];
+                if (arr && arr[file.realIndex] !== undefined) {
+                    const removed = arr.splice(file.realIndex, 1)[0];
+                    if (removed) {
+                        revokeFileURL(removed);
+                        showToast('Deleted from vault');
+                    }
+                }
+                renderFileGrid();
+                closeOptionsModal();
+            });
+
+            function saveToDevice(fileObj) {
+                if (!fileObj) return false;
+                if (fileObj.blob) {
+                    const url = fileObj.url || URL.createObjectURL(fileObj.blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileObj.name || 'file';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    if (!fileObj.url) URL.revokeObjectURL(url);
+                    return true;
+                }
+                if (fileObj.url && !fileObj.url.startsWith('blob:')) {
+                    const a = document.createElement('a');
+                    a.href = fileObj.url;
+                    a.download = fileObj.name || 'file';
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    return true;
+                }
+                return false;
+            }
+
+            // ── Viewer ───────────────────────────────
+            function openViewer(file) {
+                if (!file) return;
+                const type = getFileType(file);
+                const src = file.url || '';
+                dom.viewerContent.innerHTML = '';
+
+                if (!file.blob && !file.url) {
+                    dom.viewerContent.innerHTML = `
+                        <div class="viewer-unsupported">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                            <p>Preview not available for this sample file.<br>Upload real files to preview them here.</p>
+                        </div>`;
+                } else if (type === 'image') {
+                    dom.viewerContent.innerHTML = `<img src="${src}" class="viewer-media" alt="${escapeAttr(file.name)}">`;
+                } else if (type === 'video') {
+                    dom.viewerContent.innerHTML = `<video src="${src}" class="viewer-media" controls autoplay playsinline style="max-width:100%;max-height:100%;border-radius:12px;"></video>`;
+                } else if (type === 'audio') {
+                    dom.viewerContent.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;width:100%;"><audio src="${src}" controls style="width:85%;max-width:400px;"></audio></div>`;
+                } else if (type === 'pdf') {
+                    dom.viewerContent.innerHTML = `<iframe src="${src}" class="viewer-iframe" sandbox="allow-scripts allow-same-origin"></iframe>`;
+                } else if (type === 'text') {
+                    readFileAsText(file).then(text => {
+                        dom.viewerContent.innerHTML = `<pre class="viewer-text">${escapeHtml(text)}</pre>`;
+                    }).catch(() => {
+                        dom.viewerContent.innerHTML = `<div class="viewer-unsupported"><p>Cannot read text file.</p></div>`;
+                    });
+                } else if (type === 'html') {
+                    readFileAsText(file).then(html => {
+                        dom.viewerContent.innerHTML = `<iframe srcdoc="${escapeAttr(html)}" class="viewer-iframe" sandbox="allow-same-origin"></iframe>`;
+                    }).catch(() => {
+                        dom.viewerContent.innerHTML = `<div class="viewer-unsupported"><p>Cannot preview HTML.</p></div>`;
+                    });
+                } else {
+                    dom.viewerContent.innerHTML = `
+                        <div class="viewer-unsupported">
+                            <p>No preview available for this file type.</p>
+                            <button class="btn" id="viewerDownloadBtn">Download / Open</button>
+                        </div>`;
+                    document.getElementById('viewerDownloadBtn')?.addEventListener('click', () => {
+                        const ok = saveToDevice(file);
+                        showToast(ok ? 'Saved to device' : 'Demo file – upload real files to save');
+                    });
+                }
+                dom.viewerOverlay.classList.add('active');
+            }
+
+            function readFileAsText(file) {
+                return new Promise((resolve, reject) => {
+                    if (!file.blob) return reject('no blob');
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsText(file.blob);
+                });
+            }
+
+            function escapeHtml(text) {
+                return String(text).replace(/[&<>"]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
+                    return m;
+                });
+            }
+
+            function escapeAttr(text) {
+                return String(text).replace(/[&<>"]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
+                    return m;
+                });
+            }
+
+            function closeViewer() {
+                const media = dom.viewerContent.querySelector('video, audio');
+                if (media) media.pause();
+                dom.viewerOverlay.classList.remove('active');
+            }
+            dom.viewerClose.addEventListener('click', closeViewer);
+            dom.viewerOverlay.addEventListener('click', e => {
+                if (e.target === dom.viewerOverlay) closeViewer();
+            });
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape' && dom.viewerOverlay.classList.contains('active')) {
+                    closeViewer();
+                }
+            });
+
+            // ── Upload ───────────────────────────────
+            dom.uploadBtn.addEventListener('click', () => dom.fileInput.click());
+            dom.fileInput.addEventListener('change', e => {
+                const files = Array.from(e.target.files || []);
+                if (!files.length) return;
+                files.forEach(file => {
+                    const category = getCategoryFromFile(file);
+                    const fileObj = {
+                        name: file.name,
+                        size: file.size,
+                        blob: file,
+                        url: URL.createObjectURL(file)
+                    };
+                    state.files[category].push(fileObj);
+                });
+                if (files.length > 0) {
+                    const firstCat = getCategoryFromFile(files[0]);
+                    if (state.currentTab !== firstCat) {
+                        state.currentTab = firstCat;
+                        updateTabUI();
+                    }
+                }
+                renderFileGrid();
+                showToast(`${files.length} file(s) added to vault`);
+                dom.fileInput.value = '';
+            });
+
+            window.addEventListener('beforeunload', () => {
+                ['pictures', 'videos', 'files'].forEach(cat => {
+                    state.files[cat].forEach(f => revokeFileURL(f));
+                });
+            });
+
+            // ── Demo data (gallery‑like placeholders) ──
+            function initDemo() {
+                const demoPalettes = [
+                    'background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);',
+                    'background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);',
+                    'background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%);',
+                    'background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);',
+                    'background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);',
+                    'background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);',
+                ];
+                state.files.pictures = [
+                    { name: 'Beach_Sunset.jpg', size: 3200000, placeholderStyle: demoPalettes[0] },
+                    { name: 'Family_Pic.png', size: 2100000, placeholderStyle: demoPalettes[1] },
+                    { name: 'Screenshot_01.jpg', size: 890000, placeholderStyle: demoPalettes[2] },
+                    { name: 'Mountain_View.heic', size: 4100000, placeholderStyle: demoPalettes[3] },
+                    { name: 'Night_Sky.jpg', size: 1800000, placeholderStyle: demoPalettes[4] },
+                    { name: 'Selfie_2024.png', size: 1500000, placeholderStyle: demoPalettes[5] },
+                ];
+                state.files.videos = [
+                    { name: 'Concert_Clip.mp4', size: 28000000, placeholderStyle: demoPalettes[0] },
+                    { name: 'Private_Video.mp4', size: 45000000, placeholderStyle: demoPalettes[2] },
+                ];
+                state.files.files = [
+                    { name: 'Project_Notes.pdf', size: 450000, placeholderStyle: demoPalettes[3] },
+                    { name: 'Resume.docx', size: 85000, placeholderStyle: demoPalettes[4] },
+                    { name: 'index.html', size: 3200, placeholderStyle: demoPalettes[5] },
+                ];
+                renderFileGrid();
+                updateCounts();
+                updateStorageInfo();
+            }
+
+            initDemo();
+            updateTabUI();
+            console.log('VishuX Files – hidden vault ready.');
+        })();
+    </script>
+</body>
+</html>

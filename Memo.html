@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Momo – Minimalist Messenger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #ffffff;
+      --surface: #f8f8f8;
+      --text: #1a1a1a;
+      --secondary-text: #8e8e93;
+      --bubble-sent: #FFA07A;
+      --bubble-received: #eeeeee;
+      --accent: #FFA07A;
+      --border: #e5e5ea;
+      --unread-bg: #f2f2f7;
+      --tab-bar-bg: rgba(255,255,255,0.9);
+      --chat-bg: #ffffff;
+      --input-bg: var(--surface);
+    }
+
+    body.dark {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --text: #ffffff;
+      --secondary-text: #8e8e93;
+      --bubble-sent: #FFA07A;
+      --bubble-received: #2c2c2e;
+      --accent: #FFA07A;
+      --border: #38383a;
+      --unread-bg: #2c2c2e;
+      --tab-bar-bg: rgba(28,28,30,0.9);
+      --chat-bg: #000000;
+      --input-bg: var(--surface);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+    }
+
+    .app-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .screen { display: none; flex-direction: column; height: 100%; }
+    .screen.active { display: flex; }
+
+    .header {
+      padding: 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header-button {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text);
+      padding: 4px;
+    }
+
+    .search-bar {
+      margin: 12px 16px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border-radius: 10px;
+      font-size: 16px;
+      color: var(--text);
+      border: none;
+      outline: none;
+    }
+
+    .list {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 70px;
+    }
+
+    .chat-item, .contact-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s;
+      gap: 14px;
+    }
+    .chat-item:active, .contact-item:active { background: var(--unread-bg); }
+    .chat-item.unread { background: var(--unread-bg); }
+
+    .avatar-placeholder {
+      width: 44px; height: 44px;
+      border-radius: 22px;
+      background: var(--bubble-received);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; color: var(--secondary-text);
+    }
+
+    .chat-info, .contact-info { flex: 1; overflow: hidden; }
+    .chat-name, .contact-name { font-size: 17px; font-weight: 500; }
+    .chat-last-msg, .contact-sub { font-size: 14px; color: var(--secondary-text); }
+
+    .chat-meta {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+    }
+    .chat-time { font-size: 13px; color: var(--secondary-text); }
+    .unread-badge {
+      background: var(--accent); color: white; font-size: 12px; font-weight: 600;
+      padding: 2px 6px; border-radius: 10px; min-width: 20px; text-align: center;
+    }
+    .sms-tag {
+      font-size: 11px; color: var(--secondary-text); background: var(--surface);
+      padding: 1px 6px; border-radius: 8px; margin-left: 6px;
+    }
+
+    .theme-select {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .tab-bar {
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 8px 0 20px 0;
+      background: var(--tab-bar-bg); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      position: absolute; bottom: 0; left: 0; right: 0;
+    }
+    .tab-button {
+      background: none; border: none; font-size: 12px; color: var(--secondary-text);
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; padding: 8px;
+    }
+    .tab-button.active { color: var(--accent); font-weight: 500; }
+    .tab-icon { font-size: 24px; }
+
+    /* Chat screen */
+    .chat-header {
+      padding: 12px 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .back-button { background: none; border: none; color: var(--accent); font-size: 24px; cursor: pointer; }
+    .chat-header-name { font-size: 17px; font-weight: 600; }
+    .encryption-badge { font-size: 12px; color: var(--secondary-text); margin-left: 8px; }
+    .theme-picker-btn {
+      background: none; border: none; font-size: 20px; cursor: pointer;
+      margin-left: auto; padding: 4px;
+    }
+
+    .theme-popup {
+      position: absolute; top: 50px; right: 16px;
+      background: var(--surface); border-radius: 12px;
+      padding: 8px; display: flex; gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 10;
+      display: none;
+    }
+    .theme-popup.show { display: flex; }
+    .theme-circle {
+      width: 32px; height: 32px; border-radius: 16px;
+      cursor: pointer; border: 2px solid transparent;
+      transition: transform 0.1s;
+    }
+    .theme-circle:active { transform: scale(1.1); }
+    .theme-circle.selected { border-color: var(--text); }
+
+    .message-list {
+      flex: 1; padding: 16px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 8px;
+      background: var(--chat-bg);
+    }
+    .message-row { display: flex; flex-direction: column; max-width: 80%; }
+    .message-row.sent { align-self: flex-end; align-items: flex-end; }
+    .message-row.received { align-self: flex-start; align-items: flex-start; }
+    .bubble {
+      padding: 10px 14px; border-radius: 18px;
+      font-size: 16px; line-height: 1.4; word-break: break-word;
+      background: var(--bubble-received); color: var(--text);
+    }
+    .sent .bubble { background: var(--bubble-sent); color: #ffffff; }
+    .message-time { font-size: 12px; color: var(--secondary-text); margin-top: 4px; padding: 0 6px; }
+    .disappear-timer-tag { font-size: 12px; color: var(--secondary-text); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+    .input-container {
+      display: flex; align-items: flex-end; padding: 8px 16px 20px 16px;
+      background: var(--chat-bg); border-top: 1px solid var(--border); gap: 8px;
+    }
+    .message-input {
+      flex: 1; padding: 10px 16px; border-radius: 20px;
+      border: 1px solid var(--border); background: var(--input-bg);
+      color: var(--text); font-size: 16px; outline: none;
+    }
+    .send-button {
+      background: var(--accent); border: none; color: white;
+      width: 40px; height: 40px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer;
+    }
+    .timer-selector {
+      display: flex; gap: 8px; padding: 8px 16px;
+      background: var(--surface); border-top: 1px solid var(--border);
+    }
+    .timer-option {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 6px 12px; font-size: 13px; cursor: pointer;
+    }
+    .timer-option.selected { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .settings-list { padding: 16px; }
+    .setting-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .toggle-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e5e5ea; transition: .2s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 2px; bottom: 2px; background-color: white; transition: .2s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    input:checked + .slider { background-color: var(--accent); }
+    input:checked + .slider:before { transform: translateX(22px); }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; color: var(--secondary-text); font-size: 16px; gap: 8px;
+    }
+
+    .sms-banner {
+      background: var(--surface); padding: 6px 16px; font-size: 13px;
+      color: var(--secondary-text); text-align: center; border-bottom: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <!-- Chats Screen -->
+  <div id="chats-screen" class="screen active">
+    <div class="header">
+      <span class="header-title">Momo</span>
+      <button class="header-button" onclick="switchToContacts()" title="Contacts">👥</button>
+    </div>
+    <input type="text" class="search-bar" placeholder="Search" id="searchInput" oninput="filterChats()">
+    <div class="list" id="chatList"></div>
+    <div class="tab-bar">
+      <button class="tab-button active" onclick="switchTab('chats')"><span class="tab-icon">💬</span> Chats</button>
+      <button class="tab-button" onclick="switchTab('calls')"><span class="tab-icon">📞</span> Calls</button>
+      <button class="tab-button" onclick="switchTab('settings')"><span class="tab-icon">⚙️</span> Settings</button>
+    </div>
+  </div>
+
+  <!-- Contacts Screen -->
+  <div id="contacts-screen" class="screen">
+    <div class="header">
+      <button class="back-button" onclick="goBackToChatsFromContacts()">←</button>
+      <span class="header-title" style="font-size:24px;">All Contacts</span>
+      <span></span> <!-- placeholder to keep alignment -->
+    </div>
+    <div class="list" id="contactList"></div>
+  </div>
+
+  <!-- Calls Screen (placeholder) -->
+  <div id="calls-screen" class="screen">
+    <div class="header">
+      <span class="header-title">Calls</span>
+      <span></span>
+    </div>
+    <div class="empty-state">
+      <div style="font-size:40px">📞</div>
+      <div>No recent calls</div>
+      <div style="font-size:14px; color:var(--secondary-text)">Voice & video calls are end-to-end encrypted</div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-button" onclick="switchTab('chats')">💬 Chats</button>
+      <button class="tab-button active" onclick="switchTab('calls')">📞 Calls</button>
+      <button class="tab-button" onclick="switchTab('settings')">⚙️ Settings</button>
+    </div>
+  </div>
+
+  <!-- Settings Screen -->
+  <div id="settings-screen" class="screen">
+    <div class="header">
+      <span class="header-title">Settings</span>
+      <span></span>
+    </div>
+    <div class="settings-list">
+      <div class="setting-item">
+        <span>Dark Mode</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <span>Default Disappearing Messages</span>
+        <select id="defaultTimer" onchange="setDefaultTimer()" style="padding:6px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text)">
+          <option value="0">Off</option>
+          <option value="30">30 seconds</option>
+          <option value="60">1 minute</option>
+          <option value="300">5 minutes</option>
+          <option value="3600">1 hour</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <span>About Momo</span>
+        <span style="color:var(--secondary-text)">v1.2 · E2E + SMS</span>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-button" onclick="switchTab('chats')">💬 Chats</button>
+      <button class="tab-button" onclick="switchTab('calls')">📞 Calls</button>
+      <button class="tab-button active" onclick="switchTab('settings')">⚙️ Settings</button>
+    </div>
+  </div>
+
+  <!-- Chat Detail Screen -->
+  <div id="chat-screen" class="screen">
+    <div class="chat-header">
+      <button class="back-button" onclick="goBackToChats()">←</button>
+      <div class="chat-header-name" id="chatPartnerName"></div>
+      <div class="encryption-badge" id="encryptionBadge"></div>
+      <button class="theme-picker-btn" onclick="toggleThemePopup()" title="Chat theme">🎨</button>
+      <div class="theme-popup" id="themePopup">
+        <div class="theme-circle" style="background:#FFA07A;" data-theme="peach" onclick="setTheme('peach')"></div>
+        <div class="theme-circle" style="background:#98D8C8;" data-theme="mint" onclick="setTheme('mint')"></div>
+        <div class="theme-circle" style="background:#C3AED6;" data-theme="lavender" onclick="setTheme('lavender')"></div>
+        <div class="theme-circle" style="background:#87CEEB;" data-theme="sky" onclick="setTheme('sky')"></div>
+        <div class="theme-circle" style="background:#FF6B6B;" data-theme="coral" onclick="setTheme('coral')"></div>
+      </div>
+    </div>
+    <div class="sms-banner" id="smsBanner" style="display:none;">📱 SMS conversation (not encrypted)</div>
+    <div class="timer-selector" id="timerSelector">
+      <span style="font-size:13px; color:var(--secondary-text); margin-right:4px">Disappear:</span>
+      <span class="timer-option selected" data-timer="0" onclick="setChatTimer(0)">Off</span>
+      <span class="timer-option" data-timer="30" onclick="setChatTimer(30)">30s</span>
+      <span class="timer-option" data-timer="60" onclick="setChatTimer(60)">1m</span>
+      <span class="timer-option" data-timer="300" onclick="setChatTimer(300)">5m</span>
+      <span class="timer-option" data-timer="3600" onclick="setChatTimer(3600)">1h</span>
+    </div>
+    <div class="message-list" id="messageList"></div>
+    <div class="input-container">
+      <input type="text" class="message-input" id="messageInput" placeholder="Message" onkeypress="handleKeyPress(event)">
+      <button class="send-button" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- State -----
+    const contacts = [
+      { id: '1', name: 'Alice', lastMsg: 'See you tomorrow!', time: '10:42', unread: 2, isAppUser: true },
+      { id: '2', name: 'Bob', lastMsg: 'Photo', time: '09:15', unread: 0, isAppUser: true },
+      { id: '3', name: 'Charlie', lastMsg: 'Disappearing message test', time: 'Yesterday', unread: 1, isAppUser: true },
+      { id: '4', name: 'Diana', lastMsg: 'Call me when free', time: 'Monday', unread: 0, isAppUser: true },
+      { id: '5', name: 'Eve (SMS)', lastMsg: 'Are you coming?', time: '11:20', unread: 2, isAppUser: false },
+      { id: '6', name: 'Frank (SMS)', lastMsg: 'OK thanks', time: 'Yesterday', unread: 0, isAppUser: false },
+    ];
+
+    let allMessages = JSON.parse(localStorage.getItem('momo_messages') || '{}');
+    let contactThemes = JSON.parse(localStorage.getItem('momo_themes') || '{}');
+
+    if (Object.keys(allMessages).length === 0) {
+      allMessages['1'] = [
+        { id: 'm1', text: 'Hey! How are you?', fromMe: false, timestamp: Date.now() - 120000, disappearTimer: 0 },
+        { id: 'm2', text: 'I\'m good, thanks!', fromMe: true, timestamp: Date.now() - 60000, disappearTimer: 0 },
+      ];
+      allMessages['2'] = [
+        { id: 'm3', text: 'Can you send the file?', fromMe: false, timestamp: Date.now() - 3600000, disappearTimer: 0 },
+      ];
+      allMessages['3'] = [
+        { id: 'm4', text: 'This message will self-destruct in 30s', fromMe: false, timestamp: Date.now() - 5000, disappearTimer: 30 },
+      ];
+      allMessages['5'] = [
+        { id: 'm5', text: 'Hey Eve, still on for tonight?', fromMe: true, timestamp: Date.now() - 1800000, disappearTimer: 0 },
+        { id: 'm6', text: 'Yes, see you at 8!', fromMe: false, timestamp: Date.now() - 1600000, disappearTimer: 0 },
+      ];
+    }
+
+    let currentChatId = null;
+    let chatTimer = 0;
+
+    const chatListEl = document.getElementById('chatList');
+    const contactListEl = document.getElementById('contactList');
+    const messageListEl = document.getElementById('messageList');
+    const chatScreen = document.getElementById('chat-screen');
+    const chatsScreen = document.getElementById('chats-screen');
+    const contactsScreen = document.getElementById('contacts-screen');
+    const callsScreen = document.getElementById('calls-screen');
+    const settingsScreen = document.getElementById('settings-screen');
+    const chatPartnerNameEl = document.getElementById('chatPartnerName');
+    const encryptionBadge = document.getElementById('encryptionBadge');
+    const smsBanner = document.getElementById('smsBanner');
+    const timerSelector = document.getElementById('timerSelector');
+    const messageInput = document.getElementById('messageInput');
+    const searchInput = document.getElementById('searchInput');
+    const themePopup = document.getElementById('themePopup');
+
+    // ----- Helpers -----
+    function saveMessages() {
+      const clean = {};
+      for (let chatId in allMessages) {
+        clean[chatId] = allMessages[chatId].map(m => ({...m, _timeoutId: undefined, _timerSet: undefined}));
+      }
+      localStorage.setItem('momo_messages', JSON.stringify(clean));
+    }
+
+    function saveThemes() {
+      localStorage.setItem('momo_themes', JSON.stringify(contactThemes));
+    }
+
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    }
+
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      if (isToday) return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate()-1);
+      if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+      return date.toLocaleDateString([], {month:'short', day:'numeric'});
+    }
+
+    function getLastMessage(chatId) {
+      const msgs = allMessages[chatId] || [];
+      return msgs.length ? msgs[msgs.length-1] : null;
+    }
+
+    function getContact(id) {
+      return contacts.find(c => c.id === id);
+    }
+
+    // ----- Theme logic -----
+    function getThemeForChat(chatId) {
+      return contactThemes[chatId] || 'peach';
+    }
+
+    const themes = {
+      peach:  { sent: '#FFA07A', received: '#eeeeee', bg: '#ffffff', input: '#f8f8f8', accent: '#FFA07A', label: 'Peach' },
+      mint:   { sent: '#98D8C8', received: '#e0f0eb', bg: '#f5fdf9', input: '#ffffff', accent: '#98D8C8', label: 'Mint' },
+      lavender:{ sent: '#C3AED6', received: '#f0e8f5', bg: '#f8f5fb', input: '#ffffff', accent: '#C3AED6', label: 'Lavender' },
+      sky:    { sent: '#87CEEB', received: '#e1f0fa', bg: '#f5fafe', input: '#ffffff', accent: '#87CEEB', label: 'Sky' },
+      coral:  { sent: '#FF6B6B', received: '#ffe8e8', bg: '#fff5f5', input: '#ffffff', accent: '#FF6B6B', label: 'Coral' },
+    };
+
+    function applyTheme(chatId) {
+      const themeName = getThemeForChat(chatId);
+      const theme = themes[themeName];
+      const root = document.documentElement;
+      root.style.setProperty('--bubble-sent', theme.sent);
+      root.style.setProperty('--bubble-received', theme.received);
+      root.style.setProperty('--chat-bg', theme.bg);
+      root.style.setProperty('--input-bg', theme.input);
+      root.style.setProperty('--accent', theme.accent);
+      document.querySelectorAll('.send-button').forEach(b => b.style.background = theme.accent);
+    }
+
+    function setTheme(themeName) {
+      if (!currentChatId) return;
+      contactThemes[currentChatId] = themeName;
+      saveThemes();
+      applyTheme(currentChatId);
+      updateThemePopupSelection();
+      themePopup.classList.remove('show');
+      // update contacts screen if visible
+      if (contactsScreen.classList.contains('active')) {
+        renderContactList();
+      }
+    }
+
+    function updateThemePopupSelection() {
+      const circles = document.querySelectorAll('.theme-circle');
+      circles.forEach(c => {
+        if (c.dataset.theme === getThemeForChat(currentChatId || '')) {
+          c.classList.add('selected');
+        } else {
+          c.classList.remove('selected');
+        }
+      });
+    }
+
+    function toggleThemePopup() {
+      themePopup.classList.toggle('show');
+      updateThemePopupSelection();
+    }
+
+    // ----- Disappearing messages -----
+    function setChatTimer(seconds) {
+      chatTimer = parseInt(seconds);
+      updateTimerUI();
+    }
+
+    function updateTimerUI() {
+      const options = document.querySelectorAll('#timerSelector .timer-option');
+      options.forEach(opt => {
+        if (parseInt(opt.dataset.timer) === chatTimer) opt.classList.add('selected');
+        else opt.classList.remove('selected');
+      });
+    }
+
+    function setupDisappearingTimers(chatId) {
+      const msgs = allMessages[chatId] || [];
+      msgs.forEach(msg => {
+        if (msg.disappearTimer > 0 && !msg._timerSet) {
+          scheduleMessageDeletion(chatId, msg);
+        }
+      });
+    }
+
+    function scheduleMessageDeletion(chatId, msg) {
+      if (msg.disappearTimer <= 0) return;
+      const remaining = msg.timestamp + msg.disappearTimer * 1000 - Date.now();
+      if (remaining <= 0) {
+        deleteMessage(chatId, msg.id);
+        return;
+      }
+      if (msg._timeoutId) clearTimeout(msg._timeoutId);
+      msg._timeoutId = setTimeout(() => {
+        deleteMessage(chatId, msg.id);
+      }, remaining);
+      msg._timerSet = true;
+    }
+
+    function deleteMessage(chatId, msgId) {
+      if (!allMessages[chatId]) return;
+      allMessages[chatId] = allMessages[chatId].filter(m => m.id !== msgId);
+      saveMessages();
+      if (currentChatId === chatId) renderMessages();
+      renderChatList(searchInput.value);
+    }
+
+    // ----- Render chat list -----
+    function renderChatList(filter = '') {
+      if (!chatListEl) return;
+      chatListEl.innerHTML = '';
+      const filtered = contacts.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+      filtered.forEach(contact => {
+        const lastMsgObj = getLastMessage(contact.id);
+        const lastText = lastMsgObj ? lastMsgObj.text : contact.lastMsg;
+        const timeStr = lastMsgObj ? formatTime(lastMsgObj.timestamp) : contact.time;
+
+        const div = document.createElement('div');
+        div.className = `chat-item ${contact.unread > 0 ? 'unread' : ''}`;
+        div.onclick = () => openChat(contact.id, contact.name, contact.isAppUser);
+        div.innerHTML = `
+          <div class="avatar-placeholder">${contact.name[0]}</div>
+          <div class="chat-info">
+            <div class="chat-name">${contact.name} ${!contact.isAppUser ? '<span class="sms-tag">SMS</span>' : ''}</div>
+            <div class="chat-last-msg">${lastText}</div>
+          </div>
+          <div class="chat-meta">
+            <div class="chat-time">${timeStr}</div>
+            ${contact.unread > 0 ? `<div class="unread-badge">${contact.unread}</div>` : ''}
+          </div>
+        `;
+        chatListEl.appendChild(div);
+      });
+    }
+
+    // ----- Render contact list -----
+    function renderContactList() {
+      if (!contactListEl) return;
+      contactListEl.innerHTML = '';
+      contacts.forEach(contact => {
+        const themeName = getThemeForChat(contact.id);
+        const theme = themes[themeName];
+
+        const row = document.createElement('div');
+        row.className = 'contact-item';
+        row.innerHTML = `
+          <div class="avatar-placeholder">${contact.name[0]}</div>
+          <div class="contact-info">
+            <div class="contact-name">${contact.name} ${!contact.isAppUser ? '<span class="sms-tag">SMS</span>' : ''}</div>
+            <div class="contact-sub">
+              <span style="display:inline-block;width:12px;height:12px;border-radius:6px;background:${theme.sent};vertical-align:middle;margin-right:6px;"></span>
+              Theme: ${theme.label}
+            </div>
+          </div>
+          <select class="theme-select" data-contact-id="${contact.id}" onchange="updateContactTheme(this)">
+            <option value="peach" ${themeName === 'peach' ? 'selected' : ''}>Peach</option>
+            <option value="mint" ${themeName === 'mint' ? 'selected' : ''}>Mint</option>
+            <option value="lavender" ${themeName === 'lavender' ? 'selected' : ''}>Lavender</option>
+            <option value="sky" ${themeName === 'sky' ? 'selected' : ''}>Sky</option>
+            <option value="coral" ${themeName === 'coral' ? 'selected' : ''}>Coral</option>
+          </select>
+        `;
+        contactListEl.appendChild(row);
+      });
+    }
+
+    function updateContactTheme(selectEl) {
+      const contactId = selectEl.dataset.contactId;
+      const newTheme = selectEl.value;
+      contactThemes[contactId] = newTheme;
+      saveThemes();
+      // Update the theme indicator color
+      renderContactList(); // re-render to update the dot and label
+      // If chat is open for that contact, update theme there as well
+      if (currentChatId === contactId) {
+        applyTheme(contactId);
+        updateThemePopupSelection();
+      }
+    }
+
+    function switchToContacts() {
+      hideAllScreens();
+      contactsScreen.classList.add('active');
+      renderContactList();
+    }
+
+    function goBackToChatsFromContacts() {
+      hideAllScreens();
+      chatsScreen.classList.add('active');
+      renderChatList(searchInput.value);
+    }
+
+    function hideAllScreens() {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    }
+
+    // ----- Open chat -----
+    function openChat(chatId, name, isAppUser) {
+      currentChatId = chatId;
+      chatPartnerNameEl.textContent = name;
+      chatTimer = 0;
+
+      if (!isAppUser) {
+        encryptionBadge.textContent = '📱 SMS';
+        smsBanner.style.display = 'block';
+        timerSelector.style.display = 'none';
+      } else {
+        encryptionBadge.textContent = '🔒 E2E';
+        smsBanner.style.display = 'none';
+        timerSelector.style.display = 'flex';
+      }
+
+      applyTheme(chatId);
+      updateTimerUI();
+      renderMessages();
+      setupDisappearingTimers(chatId);
+
+      hideAllScreens();
+      chatScreen.classList.add('active');
+    }
+
+    function goBackToChats() {
+      hideAllScreens();
+      chatsScreen.classList.add('active');
+      currentChatId = null;
+      // reset theme to default
+      document.documentElement.style.removeProperty('--bubble-sent');
+      document.documentElement.style.removeProperty('--bubble-received');
+      document.documentElement.style.removeProperty('--chat-bg');
+      document.documentElement.style.removeProperty('--input-bg');
+      document.documentElement.style.removeProperty('--accent');
+      renderChatList(searchInput.value);
+    }
+
+    function switchTab(tab) {
+      hideAllScreens();
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      if (tab === 'chats') {
+        chatsScreen.classList.add('active');
+        document.querySelector('#chats-screen .tab-button')?.classList.add('active');
+        renderChatList(searchInput.value);
+      } else if (tab === 'calls') {
+        callsScreen.classList.add('active');
+        document.querySelector('#calls-screen .tab-button')?.classList.add('active');
+      } else if (tab === 'settings') {
+        settingsScreen.classList.add('active');
+        document.querySelector('#settings-screen .tab-button')?.classList.add('active');
+      }
+    }
+
+    function filterChats() {
+      renderChatList(searchInput.value);
+    }
+
+    // ----- Messaging -----
+    function sendMessage() {
+      if (!currentChatId) return;
+      const text = messageInput.value.trim();
+      if (!text) return;
+      const contact = getContact(currentChatId);
+      const isAppUser = contact ? contact.isAppUser : true;
+      const msg = {
+        id: generateId(),
+        text,
+        fromMe: true,
+        timestamp: Date.now(),
+        disappearTimer: isAppUser ? chatTimer : 0,
+      };
+      if (!allMessages[currentChatId]) allMessages[currentChatId] = [];
+      allMessages[currentChatId].push(msg);
+      saveMessages();
+      messageInput.value = '';
+
+      if (isAppUser && chatTimer > 0) {
+        scheduleMessageDeletion(currentChatId, msg);
+      }
+
+      renderMessages();
+      setTimeout(() => simulateIncomingMessage(), 1000 + Math.random() * 1500);
+    }
+
+    function simulateIncomingMessage() {
+      if (!currentChatId) return;
+      const contact = getContact(currentChatId);
+      const isAppUser = contact ? contact.isAppUser : true;
+      const replies = ["👍", "Got it!", "See you there", "Can you repeat?", "😊", "Sure thing", "On my way", "Haha", "Okay", "❤️"];
+      const msg = {
+        id: generateId(),
+        text: replies[Math.floor(Math.random() * replies.length)],
+        fromMe: false,
+        timestamp: Date.now(),
+        disappearTimer: isAppUser ? chatTimer : 0,
+      };
+      allMessages[currentChatId].push(msg);
+      saveMessages();
+      if (isAppUser && chatTimer > 0) scheduleMessageDeletion(currentChatId, msg);
+      renderMessages();
+      renderChatList();
+    }
+
+    function renderMessages() {
+      if (!currentChatId || !messageListEl) return;
+      const msgs = allMessages[currentChatId] || [];
+      messageListEl.innerHTML = '';
+      msgs.forEach(msg => {
+        const row = document.createElement('div');
+        row.className = `message-row ${msg.fromMe ? 'sent' : 'received'}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = msg.text;
+        row.appendChild(bubble);
+        const timeDiv = document.createElement('div');
+        timeDiv.className = 'message-time';
+        timeDiv.textContent = formatTime(msg.timestamp);
+        row.appendChild(timeDiv);
+        if (msg.disappearTimer > 0) {
+          const timerDiv = document.createElement('div');
+          timerDiv.className = 'disappear-timer-tag';
+          timerDiv.innerHTML = `⏳ ${msg.disappearTimer}s`;
+          row.appendChild(timerDiv);
+        }
+        messageListEl.appendChild(row);
+      });
+      messageListEl.scrollTop = messageListEl.scrollHeight;
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    // ----- Dark Mode -----
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('momo_dark', document.body.classList.contains('dark'));
+    }
+    function loadDarkMode() {
+      if (localStorage.getItem('momo_dark') === 'true') {
+        document.body.classList.add('dark');
+        document.getElementById('darkModeToggle').checked = true;
+      }
+    }
+    function setDefaultTimer() {
+      const val = document.getElementById('defaultTimer').value;
+      localStorage.setItem('momo_default_timer', val);
+    }
+    function loadDefaultTimer() {
+      const saved = localStorage.getItem('momo_default_timer');
+      if (saved) document.getElementById('defaultTimer').value = saved;
+    }
+
+    // ----- Init -----
+    window.onload = function() {
+      loadDarkMode();
+      loadDefaultTimer();
+      renderChatList();
+      for (let chatId in allMessages) {
+        setupDisappearingTimers(chatId);
+      }
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.theme-picker-btn') && !e.target.closest('.theme-popup')) {
+          themePopup.classList.remove('show');
+        }
+      });
+    };
+
+    // Expose to global scope
+    window.switchTab = switchTab;
+    window.toggleDarkMode = toggleDarkMode;
+    window.setDefaultTimer = setDefaultTimer;
+    window.goBackToChats = goBackToChats;
+    window.sendMessage = sendMessage;
+    window.handleKeyPress = handleKeyPress;
+    window.setChatTimer = setChatTimer;
+    window.filterChats = filterChats;
+    window.toggleThemePopup = toggleThemePopup;
+    window.setTheme = setTheme;
+    window.switchToContacts = switchToContacts;
+    window.goBackToChatsFromContacts = goBackToChatsFromContacts;
+    window.updateContactTheme = updateContactTheme;
+  })();
+</script>
+</body>
+</html>

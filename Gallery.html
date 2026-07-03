@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vishux Gallery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4a90e2;
+            --secondary: #fdbb2d;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --nav-height: 70px;
+            
+            /* Light theme (default) */
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --card-bg: #f8f9fa;
+            --border-color: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --input-bg: #ffffff;
+        }
+
+        .dark-theme {
+            /* Dark theme */
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
+            --border-color: #333333;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --input-bg: #2d2d2d;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: var(--nav-height);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        header {
+            text-align: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .upload-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .upload-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            margin: 5px;
+            border: none;
+            width: 100%;
+            max-width: 180px;
+        }
+
+        .upload-btn:hover {
+            background: #357ae8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .image-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-info {
+            padding: 10px;
+        }
+
+        .image-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9rem;
+        }
+
+        .image-date {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        .image-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .action-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border: none;
+            color: var(--text-color);
+            padding: 5px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.15);
+            color: var(--danger);
+        }
+
+        .delete-btn:hover {
+            background: rgba(220, 53, 69, 0.25);
+        }
+
+        .favorite-btn {
+            background: rgba(255, 193, 7, 0.15);
+            color: #d4a017;
+        }
+
+        .favorite-btn:hover {
+            background: rgba(255, 193, 7, 0.25);
+        }
+
+        .favorited {
+            background: rgba(255, 193, 7, 0.25);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 15px;
+            opacity: 0.7;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            max-width: 95%;
+            max-height: 70%;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .search-container {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        #searchInput {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px 16px;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        #searchInput::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .dark-theme #searchInput::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .tab {
+            padding: 8px 15px;
+            background: var(--card-bg);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .edit-panel {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .edit-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .edit-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .edit-control label {
+            font-size: 0.75rem;
+        }
+
+        .edit-control input {
+            width: 100%;
+        }
+
+        .edit-preview {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .edit-preview img {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .share-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .share-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 130px;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .share-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-theme .share-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .share-whatsapp {
+            background: rgba(37, 211, 102, 0.1);
+            color: #25d366;
+            border-color: rgba(37, 211, 102, 0.2);
+        }
+
+        .share-facebook {
+            background: rgba(59, 89, 152, 0.1);
+            color: #3b5998;
+            border-color: rgba(59, 89, 152, 0.2);
+        }
+
+        .share-twitter {
+            background: rgba(29, 161, 242, 0.1);
+            color: #1da1f2;
+            border-color: rgba(29, 161, 242, 0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            min-width: 100px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--nav-height);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            z-index: 999;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 0;
+            flex: 1;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            opacity: 1;
+        }
+
+        .nav-icon {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 0.65rem;
+        }
+
+        /* Page Sections */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Swipe animations */
+        .page {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Edit Canvas */
+        #editCanvas {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        /* Upload Options */
+        .upload-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .toggle-container {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-checkbox {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-checkbox:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        .toggle-checkbox:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Settings Section */
+        .settings-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .settings-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 700px;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+            
+            .image-card img {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Page -->
+    <div class="page active" id="home-page">
+        <div class="container">
+            <header>
+                <h1>Vishux Gallery</h1>
+            </header>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalImages">0</div>
+                    <div class="stat-label">Total Images</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="favoriteCount">0</div>
+                    <div class="stat-label">Favorites</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="storageUsed">0 MB</div>
+                    <div class="stat-label">Storage Used</div>
+                </div>
+            </div>
+
+            <div class="upload-section">
+                <h3>Add Photos</h3>
+                <div class="upload-options">
+                    <input type="file" id="fileInput" accept="image/*" multiple>
+                    <label for="fileInput" class="upload-btn">
+                        <i class="fas fa-images"></i> Choose Images
+                    </label>
+                    <button class="upload-btn" id="cameraBtn">
+                        <i class="fas fa-camera"></i> Take Photo
+                    </button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="all">All Images</div>
+                <div class="tab" data-tab="favorites">Favorites</div>
+                <div class="tab" data-tab="recent">Recent</div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search your photos...">
+            </div>
+
+            <div class="gallery" id="galleryContainer">
+                <!-- Images will be dynamically added here -->
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-camera"></i>
+                <h3>Your gallery is empty</h3>
+                <p>Add some photos to get started</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Page -->
+    <div class="page" id="upload-page">
+        <div class="container">
+            <header>
+                <h1>Upload Photos</h1>
+            </header>
+
+            <div class="upload-section">
+                <h3>Choose Source</h3>
+                <div class="upload-options">
+                    <input type="file" id="fileInputUpload" accept="image/*" multiple>
+                    <label for="fileInputUpload" class="upload-btn">
+                        <i class="fas fa-folder-open"></i> Gallery
+                    </label>
+                    <button class="upload-btn" id="cameraBtnUpload">
+                        <i class="fas fa-camera"></i> Camera
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>Quick Actions</h3>
+                    <button class="upload-btn btn-danger" id="clearAllBtn">
+                        <i class="fas fa-trash"></i> Clear All Images
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="uploadTotalImages">0</div>
+                    <div class="stat-label">Total Images</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="uploadStorageUsed">0 MB</div>
+                    <div class="stat-label">Storage Used</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Favorites Page -->
+    <div class="page" id="favorites-page">
+        <div class="container">
+            <header>
+                <h1>Favorites</h1>
+            </header>
+
+            <div class="gallery" id="favoritesContainer">
+                <!-- Favorite images will be dynamically added here -->
+            </div>
+
+            <div class="empty-state" id="favoritesEmptyState">
+                <i class="fas fa-heart"></i>
+                <h3>No favorites yet</h3>
+                <p>Mark some images as favorites to see them here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div class="page" id="settings-page">
+        <div class="container">
+            <header>
+                <h1>Settings</h1>
+            </header>
+
+            <div class="settings-section">
+                <h3>Appearance</h3>
+                <div class="theme-toggle">
+                    <div class="toggle-label">
+                        <i class="fas fa-moon"></i> Dark Mode
+                    </div>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Storage Management</h3>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="settingsTotalImages">0</div>
+                        <div class="stat-label">Total Images</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="settingsStorageUsed">0 MB</div>
+                        <div class="stat-label">Storage Used</div>
+                    </div>
+                </div>
+                
+                <button class="upload-btn btn-danger" id="settingsClearAllBtn">
+                    <i class="fas fa-trash"></i> Clear All Images
+                </button>
+            </div>
+
+            <div class="settings-section">
+                <h3>App Information</h3>
+                <p style="text-align: center; margin: 15px 0;">Vishux Gallery v1.0</p>
+                <p style="text-align: center; opacity: 0.8;">All your photos are stored locally on your device</p>
+            </div>
+
+            <div class="footer">
+                <p>Vki Studio &copy; 2025</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" data-page="home-page">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item" data-page="upload-page">
+            <div class="nav-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="nav-label">Upload</div>
+        </div>
+        <div class="nav-item" data-page="favorites-page">
+            <div class="nav-icon"><i class="fas fa-heart"></i></div>
+            <div class="nav-label">Favorites</div>
+        </div>
+        <div class="nav-item" data-page="settings-page">
+            <div class="nav-icon"><i class="fas fa-cog"></i></div>
+            <div class="nav-label">Settings</div>
+        </div>
+    </nav>
+
+    <!-- Image View Modal -->
+    <div class="modal" id="imageModal">
+        <div class="close-modal" id="closeModal">&times;</div>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Enlarged view">
+        </div>
+        <div class="modal-actions">
+            <button class="upload-btn" id="downloadBtn">
+                <i class="fas fa-download"></i> Download
+            </button>
+            <button class="upload-btn" id="editBtn">
+                <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="upload-btn" id="shareBtn">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+            <button class="upload-btn btn-danger" id="modalDeleteBtn">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Image Modal -->
+    <div class="modal" id="editModal">
+        <div class="close-modal" id="closeEditModal">&times;</div>
+        <h2 style="color: white;">Edit Image</h2>
+        <div class="edit-panel">
+            <div class="edit-controls">
+                <div class="edit-control">
+                    <label for="brightness">Brightness</label>
+                    <input type="range" id="brightness" min="0" max="200" value="100">
+                </div>
+                <div class="edit-control">
+                    <label for="contrast">Contrast</label>
+                    <input type="range" id="contrast" min="0" max="200" value="100">
+                </div>
+                <div class="edit-control">
+                    <label for="saturation">Saturation</label>
+                    <input type="range" id="saturation" min="0" max="200" value="100">
+                </div>
+                <div class="edit-control">
+                    <label for="hue">Hue</label>
+                    <input type="range" id="hue" min="0" max="360" value="0">
+                </div>
+                <div class="edit-control">
+                    <label for="blur">Blur</label>
+                    <input type="range" id="blur" min="0" max="10" value="0">
+                </div>
+            </div>
+            <div class="edit-preview">
+                <canvas id="editCanvas"></canvas>
+            </div>
+            <div class="modal-actions">
+                <button class="upload-btn btn-success" id="saveEditBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="upload-btn" id="resetEditBtn">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const fileInputUpload = document.getElementById('fileInputUpload');
+        const galleryContainer = document.getElementById('galleryContainer');
+        const favoritesContainer = document.getElementById('favoritesContainer');
+        const emptyState = document.getElementById('emptyState');
+        const favoritesEmptyState = document.getElementById('favoritesEmptyState');
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+        const searchInput = document.getElementById('searchInput');
+        const cameraBtn = document.getElementById('cameraBtn');
+        const cameraBtnUpload = document.getElementById('cameraBtnUpload');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const settingsClearAllBtn = document.getElementById('settingsClearAllBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const editBtn = document.getElementById('editBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const modalDeleteBtn = document.getElementById('modalDeleteBtn');
+        const editModal = document.getElementById('editModal');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const editCanvas = document.getElementById('editCanvas');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+        const resetEditBtn = document.getElementById('resetEditBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const totalImagesEl = document.getElementById('totalImages');
+        const favoriteCountEl = document.getElementById('favoriteCount');
+        const storageUsedEl = document.getElementById('storageUsed');
+        const uploadTotalImagesEl = document.getElementById('uploadTotalImages');
+        const uploadStorageUsedEl = document.getElementById('uploadStorageUsed');
+        const settingsTotalImagesEl = document.getElementById('settingsTotalImages');
+        const settingsStorageUsedEl = document.getElementById('settingsStorageUsed');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Navigation elements
+        const navItems = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page');
+
+        // Edit controls
+        const brightness = document.getElementById('brightness');
+        const contrast = document.getElementById('contrast');
+        const saturation = document.getElementById('saturation');
+        const hue = document.getElementById('hue');
+        const blur = document.getElementById('blur');
+
+        // State variables
+        let currentImageId = null;
+        let currentTab = 'all';
+        let originalImage = null;
+        let editedImageData = null;
+
+        // Initialize the gallery
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved theme preference
+            const savedTheme = localStorage.getItem('vishuxGalleryTheme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeToggle.checked = true;
+            }
+            
+            loadImages();
+            updateEmptyState();
+            updateStats();
+            
+            // Add event listeners
+            fileInput.addEventListener('change', handleFileUpload);
+            fileInputUpload.addEventListener('change', handleFileUpload);
+            closeModal.addEventListener('click', closeImageModal);
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    closeImageModal();
+                }
+            });
+            searchInput.addEventListener('input', filterImages);
+            cameraBtn.addEventListener('click', openCamera);
+            cameraBtnUpload.addEventListener('click', openCamera);
+            clearAllBtn.addEventListener('click', clearAllImages);
+            settingsClearAllBtn.addEventListener('click', clearAllImages);
+            downloadBtn.addEventListener('click', downloadImage);
+            editBtn.addEventListener('click', openEditModal);
+            shareBtn.addEventListener('click', openShareModal);
+            modalDeleteBtn.addEventListener('click', deleteCurrentImage);
+            themeToggle.addEventListener('change', toggleTheme);
+            
+            // Edit modal events
+            closeEditModal.addEventListener('click', closeEditModalFunc);
+            editModal.addEventListener('click', function(e) {
+                if (e.target === editModal) {
+                    closeEditModalFunc();
+                }
+            });
+            saveEditBtn.addEventListener('click', saveEditedImage);
+            resetEditBtn.addEventListener('click', resetEditControls);
+            
+            // Tab events
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTab = this.getAttribute('data-tab');
+                    filterImages();
+                });
+            });
+            
+            // Edit control events
+            brightness.addEventListener('input', applyFilters);
+            contrast.addEventListener('input', applyFilters);
+            saturation.addEventListener('input', applyFilters);
+            hue.addEventListener('input', applyFilters);
+            blur.addEventListener('input', applyFilters);
+            
+            // Navigation events
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    navigateToPage(pageId);
+                });
+            });
+        });
+
+        // Toggle theme function
+        function toggleTheme() {
+            if (themeToggle.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('vishuxGalleryTheme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('vishuxGalleryTheme', 'light');
+            }
+        }
+
+        // Navigation function
+        function navigateToPage(pageId) {
+            // Update active nav item
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === pageId) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Show active page
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === pageId) {
+                    page.classList.add('active');
+                    
+                    // Load specific content for each page
+                    if (pageId === 'favorites-page') {
+                        loadFavorites();
+                    } else if (pageId === 'upload-page' || pageId === 'settings-page') {
+                        updateStats();
+                    }
+                }
+            });
+        }
+
+        // Handle file upload
+        function handleFileUpload(e) {
+            const files = e.target.files;
+            
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file.type.startsWith('image/')) {
+                        saveImage(file);
+                    }
+                }
+                
+                // Reset file input
+                e.target.value = '';
+                
+                // Navigate back to home after upload
+                setTimeout(() => {
+                    navigateToPage('home-page');
+                }, 500);
+            }
+        }
+
+        // Save image to local storage
+        function saveImage(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const imageData = {
+                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                    data: e.target.result,
+                    name: file.name,
+                    date: new Date().toLocaleDateString(),
+                    favorite: false,
+                    timestamp: Date.now()
+                };
+                
+                // Get existing images from local storage
+                let images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+                
+                // Add new image
+                images.push(imageData);
+                
+                // Save back to local storage
+                localStorage.setItem('vishuxGallery', JSON.stringify(images));
+                
+                // Update gallery
+                loadImages();
+                updateEmptyState();
+                updateStats();
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Load images from local storage
+        function loadImages() {
+            const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+            
+            // Clear gallery
+            galleryContainer.innerHTML = '';
+            
+            // Sort by timestamp (newest first)
+            images.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Add images to gallery
+            images.forEach(image => {
+                const imageCard = createImageCard(image);
+                galleryContainer.appendChild(imageCard);
+            });
+        }
+
+        // Load favorites
+        function loadFavorites() {
+            const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+            const favorites = images.filter(img => img.favorite);
+            
+            // Clear favorites container
+            favoritesContainer.innerHTML = '';
+            
+            // Add favorite images to container
+            favorites.forEach(image => {
+                const imageCard = createImageCard(image);
+                favoritesContainer.appendChild(imageCard);
+            });
+            
+            // Update empty state
+            if (favorites.length === 0) {
+                favoritesEmptyState.style.display = 'block';
+            } else {
+                favoritesEmptyState.style.display = 'none';
+            }
+        }
+
+        // Create image card element
+        function createImageCard(image) {
+            const card = document.createElement('div');
+            card.className = 'image-card';
+            card.setAttribute('data-id', image.id);
+            
+            card.innerHTML = `
+                <img src="${image.data}" alt="${image.name}">
+                <div class="image-info">
+                    <div class="image-title">${image.name}</div>
+                    <div class="image-date">Added: ${image.date}</div>
+                    <div class="image-actions">
+                        <button class="action-btn view-btn">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn favorite-btn ${image.favorite ? 'favorited' : ''}">
+                            <i class="fas fa-heart"></i> Fav
+                        </button>
+                        <button class="action-btn download-single-btn">
+                            <i class="fas fa-download"></i> Save
+                        </button>
+                        <button class="action-btn delete-btn">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners to buttons
+            const viewBtn = card.querySelector('.view-btn');
+            const favoriteBtn = card.querySelector('.favorite-btn');
+            const downloadBtn = card.querySelector('.download-single-btn');
+            const deleteBtn = card.querySelector('.delete-btn');
+            
+            viewBtn.addEventListener('click', function() {
+                openImageModal(image);
+            });
+            
+            favoriteBtn.addEventListener('click', function() {
+                toggleFavorite(image.id);
+            });
+            
+            downloadBtn.addEventListener('click', function() {
+                downloadSingleImage(image);
+            });
+            
+            deleteBtn.addEventListener('click', function() {
+                deleteImage(image.id);
+            });
+            
+            return card;
+        }
+
+        // Open image in modal
+        function openImageModal(image) {
+            currentImageId = image.id;
+            modalImage.src = image.data;
+            imageModal.style.display = 'flex';
+        }
+
+        // Close image modal
+        function closeImageModal() {
+            imageModal.style.display = 'none';
+            currentImageId = null;
+        }
+
+        // Delete image
+        function deleteImage(id) {
+            if (confirm('Are you sure you want to delete this image?')) {
+                let images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+                images = images.filter(image => image.id !== id);
+                localStorage.setItem('vishuxGallery', JSON.stringify(images));
+                
+                // Remove from DOM
+                const card = document.querySelector(`[data-id="${id}"]`);
+                if (card) {
+                    card.remove();
+                }
+                
+                updateEmptyState();
+                updateStats();
+                
+                // Close modal if this was the current image
+                if (currentImageId === id) {
+                    closeImageModal();
+                }
+                
+                // Reload favorites if we're on favorites page
+                if (document.getElementById('favorites-page').classList.contains('active')) {
+                    loadFavorites();
+                }
+            }
+        }
+
+        // Delete current image (from modal)
+        function deleteCurrentImage() {
+            if (currentImageId) {
+                deleteImage(currentImageId);
+            }
+        }
+
+        // Toggle favorite status
+        function toggleFavorite(id) {
+            let images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+            const imageIndex = images.findIndex(image => image.id === id);
+            
+            if (imageIndex !== -1) {
+                images[imageIndex].favorite = !images[imageIndex].favorite;
+                localStorage.setItem('vishuxGallery', JSON.stringify(images));
+                
+                // Update UI
+                const card = document.querySelector(`[data-id="${id}"]`);
+                if (card) {
+                    const favoriteBtn = card.querySelector('.favorite-btn');
+                    
+                    if (images[imageIndex].favorite) {
+                        favoriteBtn.classList.add('favorited');
+                    } else {
+                        favoriteBtn.classList.remove('favorited');
+                    }
+                }
+                
+                updateStats();
+                
+                // Re-filter if we're on favorites tab
+                if (currentTab === 'favorites') {
+                    filterImages();
+                }
+                
+                // Reload favorites if we're on favorites page
+                if (document.getElementById('favorites-page').classList.contains('active')) {
+                    loadFavorites();
+                }
+            }
+        }
+
+        // Download single image
+        function downloadSingleImage(image) {
+            const link = document.createElement('a');
+            link.href = image.data;
+            link.download = image.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Download current image (from modal)
+        function downloadImage() {
+            if (currentImageId) {
+                const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+                const image = images.find(img => img.id === currentImageId);
+                
+                if (image) {
+                    downloadSingleImage(image);
+                }
+            }
+        }
+
+        // Open edit modal
+        function openEditModal() {
+            if (currentImageId) {
+                const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+                const image = images.find(img => img.id === currentImageId);
+                
+                if (image) {
+                    // Store original image
+                    originalImage = new Image();
+                    originalImage.src = image.data;
+                    
+                    originalImage.onload = function() {
+                        // Set canvas dimensions
+                        const maxWidth = 400;
+                        const ratio = Math.min(maxWidth / originalImage.width, 1);
+                        editCanvas.width = originalImage.width * ratio;
+                        editCanvas.height = originalImage.height * ratio;
+                        
+                        // Draw original image
+                        const ctx = editCanvas.getContext('2d');
+                        ctx.drawImage(originalImage, 0, 0, editCanvas.width, editCanvas.height);
+                        
+                        // Reset edit controls
+                        resetEditControls();
+                        
+                        // Show edit modal
+                        editModal.style.display = 'flex';
+                    };
+                }
+            }
+        }
+
+        // Close edit modal
+        function closeEditModalFunc() {
+            editModal.style.display = 'none';
+        }
+
+        // Apply filters to image
+        function applyFilters() {
+            if (!originalImage) return;
+            
+            const ctx = editCanvas.getContext('2d');
+            ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+            
+            // Apply filters
+            const brightnessVal = parseInt(brightness.value) - 100;
+            const contrastVal = parseInt(contrast.value) - 100;
+            const saturationVal = parseInt(saturation.value) - 100;
+            const hueVal = parseInt(hue.value);
+            const blurVal = parseFloat(blur.value);
+            
+            ctx.filter = `
+                brightness(${100 + brightnessVal}%)
+                contrast(${100 + contrastVal}%)
+                saturate(${100 + saturationVal}%)
+                hue-rotate(${hueVal}deg)
+                blur(${blurVal}px)
+            `;
+            
+            ctx.drawImage(originalImage, 0, 0, editCanvas.width, editCanvas.height);
+            
+            // Store edited image data
+            editedImageData = editCanvas.toDataURL('image/jpeg');
+        }
+
+        // Reset edit controls
+        function resetEditControls() {
+            brightness.value = 100;
+            contrast.value = 100;
+            saturation.value = 100;
+            hue.value = 0;
+            blur.value = 0;
+            applyFilters();
+        }
+
+        // Save edited image
+        function saveEditedImage() {
+            if (currentImageId && editedImageData) {
+                let images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+                const imageIndex = images.findIndex(img => img.id === currentImageId);
+                
+                if (imageIndex !== -1) {
+                    images[imageIndex].data = editedImageData;
+                    images[imageIndex].timestamp = Date.now();
+                    localStorage.setItem('vishuxGallery', JSON.stringify(images));
+                    
+                    // Update gallery
+                    loadImages();
+                    
+                    // Update modal image
+                    modalImage.src = editedImageData;
+                    
+                    // Close edit modal
+                    closeEditModalFunc();
+                    
+                    alert('Image edited successfully!');
+                }
+            }
+        }
+
+        // Open share modal
+        function openShareModal() {
+            if (currentImageId) {
+                const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+                const image = images.find(img => img.id === currentImageId);
+                
+                if (image) {
+                    // For a real app, you would implement actual sharing
+                    alert(`Sharing feature would open for: ${image.name}\n\nIn a real app, this would integrate with native sharing capabilities.`);
+                }
+            }
+        }
+
+        // Update empty state visibility
+        function updateEmptyState() {
+            const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+            
+            if (images.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        // Filter images based on search and tab
+        function filterImages() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+            const cards = document.querySelectorAll('.image-card');
+            
+            cards.forEach(card => {
+                const imageId = card.getAttribute('data-id');
+                const image = images.find(img => img.id === imageId);
+                
+                let shouldShow = true;
+                
+                // Apply tab filter
+                if (currentTab === 'favorites' && !image.favorite) {
+                    shouldShow = false;
+                } else if (currentTab === 'recent') {
+                    const oneWeekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+                    if (image.timestamp < oneWeekAgo) {
+                        shouldShow = false;
+                    }
+                }
+                
+                // Apply search filter
+                if (shouldShow && searchTerm && !image.name.toLowerCase().includes(searchTerm)) {
+                    shouldShow = false;
+                }
+                
+                card.style.display = shouldShow ? 'block' : 'none';
+            });
+        }
+
+        // Open camera (if available)
+        function openCamera() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                // Create a temporary input for camera
+                const cameraInput = document.createElement('input');
+                cameraInput.type = 'file';
+                cameraInput.accept = 'image/*';
+                cameraInput.capture = 'camera';
+                
+                cameraInput.addEventListener('change', function(e) {
+                    handleFileUpload(e);
+                    document.body.removeChild(cameraInput);
+                });
+                
+                // Trigger click and then remove
+                document.body.appendChild(cameraInput);
+                cameraInput.click();
+            } else {
+                alert('Camera access is not supported on this device/browser.');
+            }
+        }
+
+        // Clear all images
+        function clearAllImages() {
+            if (confirm('Are you sure you want to delete ALL images? This action cannot be undone.')) {
+                localStorage.removeItem('vishuxGallery');
+                galleryContainer.innerHTML = '';
+                favoritesContainer.innerHTML = '';
+                updateEmptyState();
+                updateStats();
+                closeImageModal();
+                
+                // Show empty state for favorites
+                favoritesEmptyState.style.display = 'block';
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+            const favoriteCount = images.filter(img => img.favorite).length;
+            
+            // Calculate storage used (rough estimate)
+            let storageBytes = 0;
+            images.forEach(img => {
+                // Remove data URL prefix to get base64 data
+                const base64 = img.data.split(',')[1];
+                if (base64) {
+                    // Calculate bytes from base64
+                    storageBytes += (base64.length * 3) / 4;
+                }
+            });
+            
+            const storageMB = (storageBytes / (1024 * 1024)).toFixed(2);
+            
+            totalImagesEl.textContent = images.length;
+            favoriteCountEl.textContent = favoriteCount;
+            storageUsedEl.textContent = storageMB + ' MB';
+            
+            // Update other pages
+            uploadTotalImagesEl.textContent = images.length;
+            uploadStorageUsedEl.textContent = storageMB + ' MB';
+            settingsTotalImagesEl.textContent = images.length;
+            settingsStorageUsedEl.textContent = storageMB + ' MB';
+        }
+
+        // Add some sample images on first load if gallery is empty
+        window.addEventListener('load', function() {
+            const images = JSON.parse(localStorage.getItem('vishuxGallery')) || [];
+            
+            if (images.length === 0) {
+                // Add sample images (in a real app, these would be user's own images)
+                const sampleImages = [
+                    {
+                        id: 'sample1',
+                        data: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNGExZGVlIi8+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjgwIiBjeT0iODAiIHI9IjEwIiBmaWxsPSIjNGExZGVlIi8+Cjwvc3ZnPg==',
+                        name: 'Sample Image 1',
+                        date: new Date().toLocaleDateString(),
+                        favorite: false,
+                        timestamp: Date.now()
+                    },
+                    {
+                        id: 'sample2',
+                        data: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTY0MjY1Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSIxMDAsMjAgNDAsMTgwIDE2MCwxODAiIGZpbGw9IiNmZmYiLz4KPC9zdmc+',
+                        name: 'Sample Image 2',
+                        date: new Date().toLocaleDateString(),
+                        favorite: true,
+                        timestamp: Date.now() - 86400000
+                    }
+                ];
+                
+                localStorage.setItem('vishuxGallery', JSON.stringify(sampleImages));
+                loadImages();
+                updateEmptyState();
+                updateStats();
+            }
+        });
+    </script>
+</body>
+</html>

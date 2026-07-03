@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VishuX Music</title>
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --card-bg: #f8f8f8;
+            --player-bg: #f0f0f0;
+            --border-color: #e0e0e0;
+            --progress-bg: #e0e0e0;
+            --progress-fill: var(--primary-color);
+            --now-playing-bg: linear-gradient(to bottom, #6BB1FF, #007AFF);
+        }
+
+        .dark-mode {
+            --primary-color: #0A84FF;
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
+            --player-bg: #282828;
+            --border-color: #333333;
+            --progress-bg: #444444;
+            --now-playing-bg: linear-gradient(to bottom, #1E3A8A, #0A84FF);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        .permission-banner {
+            background-color: var(--card-bg);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .permission-text {
+            flex: 1;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .permission-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 160px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            z-index: 10;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .music-feed {
+            padding: 10px;
+        }
+
+        .song-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .song-card:active {
+            transform: scale(0.98);
+        }
+
+        .song-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+            background-color: #ddd;
+        }
+
+        .song-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .song-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-artist {
+            font-size: 14px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .play-btn {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .upload-btn {
+            position: fixed;
+            bottom: 160px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--player-bg);
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .player.minimized {
+            transform: translateY(100px);
+        }
+
+        .player-expanded {
+            display: none;
+        }
+
+        .player.minimized .player-expanded {
+            display: none;
+        }
+
+        .player.minimized .player-minimized {
+            display: flex;
+        }
+
+        .player-minimized {
+            display: none;
+            align-items: center;
+        }
+
+        .player-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            margin-right: 15px;
+            background-color: #ddd;
+        }
+
+        .player-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .player-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-artist {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .player-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            margin-left: 15px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .play-pause-btn {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: var(--progress-bg);
+            border-radius: 2px;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--progress-fill);
+            border-radius: 2px;
+            width: 0%;
+            position: relative;
+        }
+
+        .progress-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .search-bar {
+            width: calc(100% - 30px);
+            margin: 10px 15px;
+            padding: 12px 15px;
+            border-radius: 25px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-color);
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+            padding: 5px;
+        }
+
+        .file-upload {
+            margin-bottom: 20px;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 40px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .cancel-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-right: 10px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .save-btn {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+
+        /* Now Playing Screen (Apple Music style) */
+        .now-playing-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--now-playing-bg);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .now-playing-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .now-playing-cover {
+            width: 280px;
+            height: 280px;
+            border-radius: 12px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.1);
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .now-playing-cover.rotating {
+            animation: rotateCover 20s linear infinite;
+        }
+
+        @keyframes rotateCover {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .now-playing-info {
+            text-align: center;
+            margin: 30px 0;
+            width: 100%;
+        }
+
+        .now-playing-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .now-playing-artist {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .now-playing-progress {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .now-playing-progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .now-playing-progress-bar {
+            height: 100%;
+            background-color: white;
+            border-radius: 2px;
+            width: 0%;
+        }
+
+        .now-playing-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .now-playing-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .now-playing-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            margin: 0 20px;
+            cursor: pointer;
+        }
+
+        .play-pause-now-btn {
+            background-color: white;
+            color: var(--primary-color);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .additional-controls {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 40px;
+            padding: 0 20px;
+        }
+
+        .additional-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Lyrics view */
+        .lyrics-container {
+            width: 100%;
+            height: 200px;
+            overflow-y: auto;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: white;
+            font-size: 16px;
+            line-height: 2;
+        }
+
+        /* Volume control */
+        .volume-control {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-icon {
+            margin: 0 10px;
+            color: white;
+        }
+
+        .volume-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Storage Permission Banner -->
+    <div class="permission-banner" id="permissionBanner">
+        <div class="permission-text">Allow storage access to play offline music</div>
+        <button class="permission-btn" id="grantPermissionBtn">Allow</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">VishuX Music</div>
+            <button class="theme-toggle" id="themeToggle">🌓</button>
+        </header>
+
+        <input type="text" class="search-bar" placeholder="Search music..." id="searchBar">
+
+        <div class="music-feed" id="musicFeed">
+            <!-- Songs will be loaded here -->
+            <div class="empty-state">Loading your music...</div>
+        </div>
+
+        <button class="upload-btn" id="uploadBtn">+</button>
+
+        <div class="player" id="player">
+            <div class="player-minimized">
+                <img src="https://via.placeholder.com/50" alt="Now Playing" class="player-cover" id="miniCover">
+                <div class="player-info">
+                    <div class="player-title" id="miniTitle">Not Playing</div>
+                    <div class="player-artist" id="miniArtist">-</div>
+                </div>
+                <div class="player-controls">
+                    <button class="player-btn play-pause-btn" id="miniPlayPauseBtn">▶</button>
+                </div>
+            </div>
+
+            <div class="player-expanded">
+                <img src="https://via.placeholder.com/200" alt="Now Playing" class="now-playing-cover" id="nowPlayingCover">
+                <div class="player-info">
+                    <div class="player-title" id="nowPlayingTitle">Not Playing</div>
+                    <div class="player-artist" id="nowPlayingArtist">-</div>
+                </div>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-time">
+                    <span id="currentTime">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+
+                <div class="player-controls" style="justify-content: center;">
+                    <button class="player-btn" id="prevBtn">⏮</button>
+                    <button class="player-btn play-pause-btn" id="playPauseBtn">▶</button>
+                    <button class="player-btn" id="nextBtn">⏭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Now Playing Screen (Apple Music style) -->
+    <div class="now-playing-screen" id="nowPlayingScreen">
+        <div class="now-playing-header">
+            <button class="back-btn" id="backBtn">↓</button>
+            <div class="now-playing-title" id="npTitle">Now Playing</div>
+            <div style="width: 24px;"></div> <!-- Spacer for balance -->
+        </div>
+
+        <img src="https://via.placeholder.com/280" alt="Now Playing" class="now-playing-cover" id="npCover">
+
+        <div class="now-playing-info">
+            <div class="now-playing-title" id="npSongTitle">Song Title</div>
+            <div class="now-playing-artist" id="npSongArtist">Artist Name</div>
+        </div>
+
+        <div class="now-playing-progress">
+            <div class="now-playing-progress-container" id="npProgressContainer">
+                <div class="now-playing-progress-bar" id="npProgressBar"></div>
+            </div>
+            <div class="now-playing-time">
+                <span id="npCurrentTime">0:00</span>
+                <span id="npDuration">3:30</span>
+            </div>
+        </div>
+
+        <div class="now-playing-controls">
+            <button class="now-playing-btn" id="npPrevBtn">⏮</button>
+            <button class="now-playing-btn play-pause-now-btn" id="npPlayPauseBtn">▶</button>
+            <button class="now-playing-btn" id="npNextBtn">⏭</button>
+        </div>
+
+        <div class="additional-controls">
+            <button class="additional-btn" id="lyricsBtn">♫</button>
+            <button class="additional-btn" id="addToPlaylistBtn">+</button>
+            <button class="additional-btn" id="shareBtn">↗</button>
+        </div>
+
+        <div class="volume-control">
+            <span class="volume-icon">🔈</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+            <span class="volume-icon">🔊</span>
+        </div>
+
+        <div class="lyrics-container" id="lyricsContainer" style="display: none;">
+            <!-- Lyrics will be displayed here -->
+            No lyrics available for this song.
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Upload Music</div>
+                <button class="close-btn" id="closeUploadModal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="songTitle">Song Title</label>
+                <input type="text" id="songTitle" placeholder="Enter song title">
+            </div>
+            <div class="form-group">
+                <label for="songArtist">Artist</label>
+                <input type="text" id="songArtist" placeholder="Enter artist name">
+            </div>
+            <div class="file-upload">
+                <label for="songFile" class="file-upload-label">
+                    <div>Click to upload music file</div>
+                    <input type="file" id="songFile" class="file-upload-input" accept="audio/*">
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="songCover">Cover Image (Optional)</label>
+                <label for="songCover" class="file-upload-label" style="padding: 20px; margin-top: 10px;">
+                    <div>Click to upload cover image</div>
+                    <input type="file" id="songCover" class="file-upload-input" accept="image/*">
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" id="cancelUpload">Cancel</button>
+                <button class="save-btn" id="saveUpload">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const permissionBanner = document.getElementById('permissionBanner');
+        const grantPermissionBtn = document.getElementById('grantPermissionBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const searchBar = document.getElementById('searchBar');
+        const musicFeed = document.getElementById('musicFeed');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadModal = document.getElementById('uploadModal');
+        const closeUploadModal = document.getElementById('closeUploadModal');
+        const cancelUpload = document.getElementById('cancelUpload');
+        const saveUpload = document.getElementById('saveUpload');
+        const player = document.getElementById('player');
+        const miniCover = document.getElementById('miniCover');
+        const miniTitle = document.getElementById('miniTitle');
+        const miniArtist = document.getElementById('miniArtist');
+        const miniPlayPauseBtn = document.getElementById('miniPlayPauseBtn');
+        const nowPlayingCover = document.getElementById('nowPlayingCover');
+        const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+        const nowPlayingArtist = document.getElementById('nowPlayingArtist');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const nowPlayingScreen = document.getElementById('nowPlayingScreen');
+        const backBtn = document.getElementById('backBtn');
+        const npCover = document.getElementById('npCover');
+        const npTitle = document.getElementById('npTitle');
+        const npSongTitle = document.getElementById('npSongTitle');
+        const npSongArtist = document.getElementById('npSongArtist');
+        const npProgressContainer = document.getElementById('npProgressContainer');
+        const npProgressBar = document.getElementById('npProgressBar');
+        const npCurrentTime = document.getElementById('npCurrentTime');
+        const npDuration = document.getElementById('npDuration');
+        const npPlayPauseBtn = document.getElementById('npPlayPauseBtn');
+        const npPrevBtn = document.getElementById('npPrevBtn');
+        const npNextBtn = document.getElementById('npNextBtn');
+        const lyricsBtn = document.getElementById('lyricsBtn');
+        const lyricsContainer = document.getElementById('lyricsContainer');
+        const addToPlaylistBtn = document.getElementById('addToPlaylistBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        // App State
+        let darkMode = false;
+        let songs = [];
+        let currentSongIndex = -1;
+        let audio = new Audio();
+        let isPlaying = false;
+        let hasStorageAccess = false;
+        let progressInterval;
+        let coverRotationInterval;
+
+        // Sample music data (in a real app, this would come from IndexedDB or a server)
+        const sampleSongs = [
+            {
+                id: 1,
+                title: "Stay",
+                artist: "The Kid LAROI, Justin Bieber",
+                cover: "https://i.scdn.co/image/ab67616d00001e02a991995542d50a691b9ae5be",
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+                duration: "2:21",
+                lyrics: "I do the same thing I told you that I never would\nI told you I'd change, even when I knew I never could"
+            },
+            {
+                id: 2,
+                title: "Good 4 U",
+                artist: "Olivia Rodrigo",
+                cover: "https://i.scdn.co/image/ab67616d00001e02b1c4b76e23414c9f20242268",
+                audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+                duration: "2:58",
+                lyrics: "Well, good for you, I guess you moved on really easily\nYou found a new girl and it only took a couple weeks"
+            }
+        ];
+
+        // Initialize App
+        function initApp() {
+            // Check theme preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                enableDarkMode();
+            }
+
+            // Check if we have storage access
+            hasStorageAccess = localStorage.getItem('hasStorageAccess') === 'true';
+            if (hasStorageAccess) {
+                permissionBanner.style.display = 'none';
+            }
+
+            // Set initial volume
+            audio.volume = volumeSlider.value;
+
+            // Load songs
+            loadSongs();
+
+            // Set up event listeners
+            setupEventListeners();
+        }
+
+        // Load songs into the app
+        function loadSongs() {
+            songs = [...sampleSongs];
+            renderSongs(songs);
+        }
+
+        // Render songs to the feed
+        function renderSongs(songsToRender) {
+            if (songsToRender.length === 0) {
+                musicFeed.innerHTML = '<div class="empty-state">No songs found. Upload some music!</div>';
+                return;
+            }
+
+            musicFeed.innerHTML = '';
+            songsToRender.forEach((song, index) => {
+                const songEl = document.createElement('div');
+                songEl.className = 'song-card';
+                songEl.innerHTML = `
+                    <img src="${song.cover}" alt="${song.title}" class="song-cover">
+                    <div class="song-info">
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-artist">${song.artist}</div>
+                    </div>
+                    <div class="song-actions">
+                        <button class="action-btn play-btn" data-id="${song.id}">▶</button>
+                    </div>
+                `;
+                musicFeed.appendChild(songEl);
+
+                // Add click event to play button and the whole card
+                const playBtn = songEl.querySelector('.play-btn');
+                playBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    playSong(index);
+                });
+                
+                songEl.addEventListener('click', () => {
+                    playSong(index);
+                    showNowPlayingScreen();
+                });
+            });
+        }
+
+        // Play a song
+        function playSong(index) {
+            if (index < 0 || index >= songs.length) return;
+
+            currentSongIndex = index;
+            const song = songs[currentSongIndex];
+
+            // Update UI
+            nowPlayingTitle.textContent = song.title;
+            nowPlayingArtist.textContent = song.artist;
+            nowPlayingCover.src = song.cover;
+            miniTitle.textContent = song.title;
+            miniArtist.textContent = song.artist;
+            miniCover.src = song.cover;
+            durationEl.textContent = song.duration;
+            npSongTitle.textContent = song.title;
+            npSongArtist.textContent = song.artist;
+            npCover.src = song.cover;
+            npDuration.textContent = song.duration;
+            lyricsContainer.textContent = song.lyrics || "No lyrics available for this song.";
+
+            // Set audio source
+            audio.src = song.audio;
+            audio.load();
+
+            // Play the song
+            audio.play()
+                .then(() => {
+                    isPlaying = true;
+                    updatePlayPauseButtons();
+                    startProgressTimer();
+                    startCoverRotation();
+                })
+                .catch(error => {
+                    console.error('Error playing song:', error);
+                    alert('Error playing song. Please try again.');
+                });
+        }
+
+        // Show the Apple Music-like now playing screen
+        function showNowPlayingScreen() {
+            nowPlayingScreen.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            player.classList.add('minimized');
+        }
+
+        // Hide the now playing screen
+        function hideNowPlayingScreen() {
+            nowPlayingScreen.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            player.classList.remove('minimized');
+        }
+
+        // Toggle play/pause
+        function togglePlayPause() {
+            if (currentSongIndex === -1 && songs.length > 0) {
+                playSong(0);
+                return;
+            }
+
+            if (isPlaying) {
+                audio.pause();
+                stopCoverRotation();
+            } else {
+                audio.play();
+                startCoverRotation();
+            }
+            isPlaying = !isPlaying;
+            updatePlayPauseButtons();
+        }
+
+        // Update play/pause buttons
+        function updatePlayPauseButtons() {
+            const icon = isPlaying ? '⏸' : '▶';
+            playPauseBtn.textContent = icon;
+            miniPlayPauseBtn.textContent = icon;
+            npPlayPauseBtn.textContent = icon;
+        }
+
+        // Play next song
+        function playNext() {
+            if (songs.length === 0) return;
+            const nextIndex = (currentSongIndex + 1) % songs.length;
+            playSong(nextIndex);
+        }
+
+        // Play previous song
+        function playPrev() {
+            if (songs.length === 0) return;
+            const prevIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            playSong(prevIndex);
+        }
+
+        // Start progress timer
+        function startProgressTimer() {
+            clearInterval(progressInterval);
+            progressInterval = setInterval(updateProgress, 1000);
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            if (isNaN(audio.duration)) return;
+
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            npProgressBar.style.width = `${progressPercent}%`;
+
+            // Update time displays
+            currentTimeEl.textContent = formatTime(audio.currentTime);
+            npCurrentTime.textContent = formatTime(audio.currentTime);
+            durationEl.textContent = formatTime(audio.duration);
+            npDuration.textContent = formatTime(audio.duration);
+        }
+
+        // Start cover rotation animation
+        function startCoverRotation() {
+            stopCoverRotation();
+            npCover.classList.add('rotating');
+        }
+
+        // Stop cover rotation animation
+        function stopCoverRotation() {
+            npCover.classList.remove('rotating');
+        }
+
+        // Format time (seconds to MM:SS)
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Seek in the song
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        }
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            if (darkMode) {
+                enableDarkMode();
+            } else {
+                disableDarkMode();
+            }
+            localStorage.setItem('darkMode', darkMode);
+        }
+
+        function enableDarkMode() {
+            document.body.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
+        }
+
+        function disableDarkMode() {
+            document.body.classList.remove('dark-mode');
+            themeToggle.textContent = '🌓';
+        }
+
+        // Grant storage permission
+        function grantStoragePermission() {
+            // In a real app, this would request actual storage permission
+            // For this demo, we'll just simulate it
+            hasStorageAccess = true;
+            localStorage.setItem('hasStorageAccess', 'true');
+            permissionBanner.style.display = 'none';
+            alert('Storage access granted. You can now save music for offline playback.');
+        }
+
+        // Upload a new song
+        function uploadSong() {
+            const title = document.getElementById('songTitle').value;
+            const artist = document.getElementById('songArtist').value;
+            const fileInput = document.getElementById('songFile');
+            const coverInput = document.getElementById('songCover');
+            
+            if (!title || !artist || !fileInput.files[0]) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const fileURL = URL.createObjectURL(file);
+
+            // Handle cover image if provided
+            let coverURL = "https://via.placeholder.com/200";
+            if (coverInput.files[0]) {
+                coverURL = URL.createObjectURL(coverInput.files[0]);
+            }
+
+            // Create a new song object
+            const newSong = {
+                id: songs.length + 1,
+                title: title,
+                artist: artist,
+                cover: coverURL,
+                audio: fileURL,
+                duration: "2:45", // In a real app, you'd get this from the audio file
+                lyrics: "No lyrics available for this song."
+            };
+
+            // Add to songs array
+            songs.unshift(newSong);
+            
+            // Re-render songs
+            renderSongs(songs);
+            
+            // Close modal and reset form
+            uploadModal.style.display = 'none';
+            document.getElementById('songTitle').value = '';
+            document.getElementById('songArtist').value = '';
+            fileInput.value = '';
+            coverInput.value = '';
+        }
+
+        // Search songs
+        function searchSongs() {
+            const query = searchBar.value.toLowerCase();
+            if (!query) {
+                renderSongs(songs);
+                return;
+            }
+
+            const filteredSongs = songs.filter(song => 
+                song.title.toLowerCase().includes(query) || 
+                song.artist.toLowerCase().includes(query)
+            );
+            renderSongs(filteredSongs);
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleDarkMode);
+
+            // Permission button
+            grantPermissionBtn.addEventListener('click', grantStoragePermission);
+
+            // Upload modal
+            uploadBtn.addEventListener('click', () => {
+                uploadModal.style.display = 'flex';
+            });
+
+            closeUploadModal.addEventListener('click', () => {
+                uploadModal.style.display = 'none';
+            });
+
+            cancelUpload.addEventListener('click', () => {
+                uploadModal.style.display = 'none';
+            });
+
+            saveUpload.addEventListener('click', uploadSong);
+
+            // Player controls
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            miniPlayPauseBtn.addEventListener('click', togglePlayPause);
+            npPlayPauseBtn.addEventListener('click', togglePlayPause);
+            prevBtn.addEventListener('click', playPrev);
+            nextBtn.addEventListener('click', playNext);
+            npPrevBtn.addEventListener('click', playPrev);
+            npNextBtn.addEventListener('click', playNext);
+
+            // Progress bars
+            progressContainer.addEventListener('click', setProgress);
+            npProgressContainer.addEventListener('click', setProgress);
+
+            // Search
+            searchBar.addEventListener('input', searchSongs);
+
+            // Now playing screen
+            backBtn.addEventListener('click', hideNowPlayingScreen);
+
+            // Lyrics toggle
+            lyricsBtn.addEventListener('click', () => {
+                lyricsContainer.style.display = lyricsContainer.style.display === 'none' ? 'block' : 'none';
+            });
+
+            // Volume control
+            volumeSlider.addEventListener('input', () => {
+                audio.volume = volumeSlider.value;
+            });
+
+            // Audio events
+            audio.addEventListener('ended', playNext);
+            audio.addEventListener('timeupdate', () => {
+                const progressPercent = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+                npProgressBar.style.width = `${progressPercent}%`;
+                currentTimeEl.textContent = formatTime(audio.currentTime);
+                npCurrentTime.textContent = formatTime(audio.currentTime);
+            });
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

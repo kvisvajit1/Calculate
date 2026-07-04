@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VishuX Note</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button id="sidebar-toggle"><i class="fas fa-bars"></i></button>
+                <h1>VishuX Note</h1>
+                <button id="new-note-btn"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="folders">
+                <div class="folder active" data-folder="all">
+                    <i class="fas fa-inbox"></i>
+                    <span>All Notes</span>
+                    <span class="count">0</span>
+                </div>
+                <div class="folder" data-folder="favorites">
+                    <i class="fas fa-star"></i>
+                    <span>Favorites</span>
+                    <span class="count">0</span>
+                </div>
+                <div class="folder" data-folder="personal">
+                    <i class="fas fa-user"></i>
+                    <span>Personal</span>
+                    <span class="count">0</span>
+                </div>
+                <div class="folder" data-folder="work">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Work</span>
+                    <span class="count">0</span>
+                </div>
+            </div>
+            <div class="notes-list">
+                <!-- Notes will be dynamically added here -->
+            </div>
+        </div>
+        <div class="note-editor">
+            <div class="toolbar">
+                <button class="tool-btn" id="bold-btn"><i class="fas fa-bold"></i></button>
+                <button class="tool-btn" id="italic-btn"><i class="fas fa-italic"></i></button>
+                <button class="tool-btn" id="heading-btn"><i class="fas fa-heading"></i></button>
+                <button class="tool-btn" id="list-btn"><i class="fas fa-list-ul"></i></button>
+                <button class="tool-btn" id="numbered-list-btn"><i class="fas fa-list-ol"></i></button>
+                <button class="tool-btn" id="checklist-btn"><i class="fas fa-tasks"></i></button>
+                <div class="spacer"></div>
+                <button class="tool-btn" id="favorite-btn"><i class="far fa-star"></i></button>
+                <button class="tool-btn" id="folder-btn"><i class="far fa-folder"></i></button>
+            </div>
+            <input type="text" id="note-title" placeholder="Title">
+            <div id="note-content" contenteditable="true" placeholder="Start writing..."></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

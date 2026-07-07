@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS Style Home Screen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+        
+        body {
+            background-color: #f2f2f7;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            color: #000;
+            font-weight: 600;
+        }
+        
+        .home-screen {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .app-icon:active {
+            transform: scale(0.9);
+        }
+        
+        .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-name {
+            color: #000;
+            font-size: 12px;
+            text-align: center;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .app-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #f2f2f7;
+            border-bottom: 1px solid #e5e5ea;
+        }
+        
+        .app-title {
+            font-weight: 600;
+        }
+        
+        .back-button {
+            color: #007aff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .app-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #8e8e93;
+        }
+        
+        .dock {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .dock .icon {
+            width: 55px;
+            height: 55px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="home-screen">
+        <!-- Row 1 -->
+        <div class="app-icon" onclick="openApp('phone')">
+            <div class="icon" style="background: linear-gradient(135deg, #4CD964, #5BD975);">
+                <span style="font-size: 28px; color: white;">📞</span>
+            </div>
+            <div class="app-name">Phone</div>
+        </div>
+        
+        <div class="app-icon" onclick="openApp('messages')">
+            <div class="icon" style="background: linear-gradient(135deg, #32ADE6, #2B9EEB);">
+                <span style="font-size: 28px; color: white;">💬</span>
+            </div>
+            <div class="app-name">Messages</div>
+        </div>
+        
+        <div class="app-icon" onclick="openApp('safari')">
+            <div class="icon" style="background: linear-gradient(135deg, #1B7DFF, #1B7DFF);">
+                <span style="font-size: 28px; color: white;">🌐</span>
+            </div>
+            <div class="app-name">Safari</div>
+        </div>
+        
+        <div class="app-icon" onclick="openApp('music')">
+            <div class="icon" style="background: linear-gradient(135deg, #FF2D55, #FF375F);">
+                <span style="font-size: 28px; color: white;">🎵</span>
+            </div>
+            <div class="app-name">Music</div>
+        </div>
+        
+        <!-- Row 2 -->
+        <div class="app-icon" onclick="openApp('photos')">
+            <div class="icon" style="background: linear-gradient(135deg, #32ADE6, #2B9EEB);">
+                <span style="font-size: 28px; color: white;">📷</span>
+            </div>
+            <div class="app-name">Photos</div>
+        </div>
+        
+        <div class="app-icon" onclick="openApp('camera')">
+            <div class="icon" style="background: linear-gradient(135deg, #5856D6, #5E5CE6);">
+                <span style="font-size: 28px; color: white;">📸</span>
+            </div>
+            <div class="app-name">Camera</div>
+        </div>
+        
+        <div class="app-icon" onclick="openApp('maps')">
+            <div class="icon" style="background: linear-gradient(135deg, #5AC8FA, #34AADC);">
+                <span style="font-size: 28px; color: white;">🗺️</span>
+            </div>
+            <div class="app-name">Maps</div>
+        </div>
+        
+        <div class="app-icon" onclick="openApp('weather')">
+            <div class="icon" style="background: linear-gradient(135deg, #FF9500, #FF9F0A);">
+                <span style="font-size: 28px; color: white;">☀️</span>
+            </div>
+            <div class="app-name">Weather</div>
+        </div>
+    </div>
+    
+    <!-- Dock -->
+    <div class="dock">
+        <div class="app-icon" onclick="openApp('phone')">
+            <div class="icon" style="background: linear-gradient(135deg, #4CD964, #5BD975);">
+                <span style="font-size: 28px; color: white;">📞</span>
+            </div>
+        </div>
+        <div class="app-icon" onclick="openApp('messages')">
+            <div class="icon" style="background: linear-gradient(135deg, #32ADE6, #2B9EEB);">
+                <span style="font-size: 28px; color: white;">💬</span>
+            </div>
+        </div>
+        <div class="app-icon" onclick="openApp('safari')">
+            <div class="icon" style="background: linear-gradient(135deg, #1B7DFF, #1B7DFF);">
+                <span style="font-size: 28px; color: white;">🌐</span>
+            </div>
+        </div>
+        <div class="app-icon" onclick="openApp('music')">
+            <div class="icon" style="background: linear-gradient(135deg, #FF2D55, #FF375F);">
+                <span style="font-size: 28px; color: white;">🎵</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- App Screens -->
+    <div id="phone-app" class="app-screen">
+        <div class="app-header">
+            <div class="back-button" onclick="closeApp('phone')">Home</div>
+            <div class="app-title">Phone</div>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="app-content">
+            Phone App Content
+        </div>
+    </div>
+    
+    <div id="messages-app" class="app-screen">
+        <div class="app-header">
+            <div class="back-button" onclick="closeApp('messages')">Home</div>
+            <div class="app-title">Messages</div>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="app-content">
+            Messages App Content
+        </div>
+    </div>
+    
+    <div id="safari-app" class="app-screen">
+        <div class="app-header">
+            <div class="back-button" onclick="closeApp('safari')">Home</div>
+            <div class="app-title">Safari</div>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="app-content">
+            Safari Browser Content
+        </div>
+    </div>
+    
+    <div id="music-app" class="app-screen">
+        <div class="app-header">
+            <div class="back-button" onclick="closeApp('music')">Home</div>
+            <div class="app-title">Music</div>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="app-content">
+            Music Player Content
+        </div>
+    </div>
+    
+    <div id="photos-app" class="app-screen">
+        <div class="app-header">
+            <div class="back-button" onclick="closeApp('photos')">Home</div>
+            <div class="app-title">Photos</div>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="app-content">
+            Photos Gallery Content
+        </div>
+    </div>
+    
+    <script>
+        function openApp(appName) {
+            document.getElementById(appName + '-app').style.display = 'flex';
+            document.querySelector('.home-screen').style.display = 'none';
+            document.querySelector('.dock').style.display = 'none';
+        }
+        
+        function closeApp(appName) {
+            document.getElementById(appName + '-app').style.display = 'none';
+            document.querySelector('.home-screen').style.display = 'grid';
+            document.querySelector('.dock').style.display = 'flex';
+        }
+        
+        // Update time in status bar
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            document.querySelector('.status-bar').firstElementChild.textContent = `${hours}:${minutes} ${ampm}`;
+        }
+        
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

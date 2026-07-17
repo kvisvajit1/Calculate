@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>બ્રુટાલિસ્ટ ગુજરાતી કેલેન્ડર ૨૦૦૧-૨૦૩૦</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- BRUTALIST OVERRIDES: raw, sharp, no curves, no shadows, maximum contrast -->
+    <style>
+        /* ---------- BRUTALIST RESET & CORE ---------- */
+        * {
+            border-radius: 0px !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            transition: none !important;
+        }
+
+        body {
+            font-family: 'Courier New', 'Roboto Mono', 'Fira Code', monospace !important;
+            background: #111111 !important;
+            padding: 1rem;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* main container: brutalist slab */
+        #app-container {
+            max-width: 480px;
+            width: 100%;
+            background: #faf9f6;
+            border: 3px solid #000000;
+            margin: 0 auto;
+            overflow: hidden;
+            box-shadow: none !important;
+        }
+
+        /* header brutal block */
+        .header-bg {
+            background: #000000 !important;
+            padding: 1.5rem 1rem !important;
+            border-bottom: 4px solid #ff2a2a;
+            position: relative;
+        }
+        .header-bg::before {
+            display: none;
+        }
+        .header-content h1, #header-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #ffffff !important;
+            text-transform: uppercase;
+        }
+        #header-subtitle {
+            color: #ffaa33 !important;
+            font-weight: bold;
+            font-size: 0.75rem;
+            background: none;
+            border-top: 1px solid #ff2a2a;
+            display: inline-block;
+            padding-top: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        /* brutalist buttons – flat, heavy */
+        .nav-button, button, .rashi-btn, [onclick] {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #000000 !important;
+            font-weight: 700 !important;
+            font-family: monospace !important;
+            padding: 0.4rem 0.8rem !important;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        .nav-button:hover, button:hover, .rashi-btn:hover {
+            background: #000000 !important;
+            color: #ffffff !important;
+            border: 2px solid #ff2a2a !important;
+        }
+
+        /* cards: pure brutal blocks */
+        .card {
+            background: #ffffff !important;
+            border: 2px solid #111111 !important;
+            margin-bottom: 1rem;
+            padding: 1rem !important;
+        }
+
+        /* grid, day cells: brutal squares */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            border: 2px solid #000;
+            background: white;
+        }
+        .day-cell {
+            background: #ffffff;
+            border: 1px solid #222 !important;
+            min-height: 70px;
+            padding: 6px 2px;
+            cursor: pointer;
+            transition: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .day-cell.empty {
+            background: #e9e9e9;
+            border: 1px solid #555;
+        }
+        .day-cell.today {
+            background: #ff2a2a !important;
+            border: 3px solid #000000 !important;
+        }
+        .day-cell.today .date-number, .day-cell.today .tithi-text {
+            color: white !important;
+            font-weight: 900;
+        }
+        .festive-day {
+            background: #000000 !important;
+            border: 2px solid #ff2a2a !important;
+        }
+        .festive-day .date-number, .festive-day .tithi-text, .festive-day span {
+            color: #ffcc00 !important;
+            font-weight: bold;
+        }
+        .day-cell:hover:not(.empty) {
+            background: #dddddd !important;
+            border: 2px solid red;
+        }
+        .date-number {
+            font-size: 1.1rem;
+            font-weight: 800;
+            font-family: monospace;
+        }
+        .tithi-text {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #2c2c2c;
+        }
+        .full-day-name {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: #000000;
+            color: white;
+            padding: 8px 2px;
+            text-align: center;
+            border: 1px solid white;
+            font-family: monospace;
+        }
+
+        /* bottom navigation: brutalist panel */
+        .sticky.bottom-0 {
+            background: #000000 !important;
+            border-top: 4px solid #ff2a2a !important;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0 !important;
+        }
+        .sticky.bottom-0 button {
+            background: transparent !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .sticky.bottom-0 button svg {
+            stroke: #ff2a2a;
+            fill: none;
+            width: 24px;
+            height: 24px;
+        }
+        .sticky.bottom-0 button:hover {
+            background: #ff2a2a !important;
+            color: black !important;
+        }
+
+        /* rashifal buttons active brutal */
+        .rashi-btn.active-rashi {
+            background: #000000 !important;
+            color: #ffaa33 !important;
+            border: 2px solid #ffaa33 !important;
+        }
+        #rashifal-result div {
+            border-left: 5px solid black !important;
+            background: #f2f2f2 !important;
+            border-radius: 0px !important;
+        }
+        /* tables, timing boxes brutal */
+        .bg-teal-100, .bg-orange-50, .bg-gray-100 {
+            background: #f0f0f0 !important;
+            border: 1px solid black !important;
+        }
+        .text-teal-600, .text-orange-600 {
+            color: #000000 !important;
+            font-weight: 800;
+        }
+        table, th, td {
+            border: 1px solid black !important;
+            border-collapse: collapse;
+        }
+        th {
+            background: #111 !important;
+            color: white !important;
+        }
+        /* remove any rounded from tailwind leftovers */
+        .rounded-full, .rounded-lg, .rounded-xl, .rounded-md, .rounded {
+            border-radius: 0px !important;
+        }
+        .shadow, .shadow-xl, .shadow-md {
+            box-shadow: none !important;
+        }
+        .border-gray-200, .border-gray-100 {
+            border-color: #000 !important;
+        }
+        /* typography raw */
+        h1, h2, h3, p, span, div {
+            font-family: 'Courier New', monospace;
+        }
+        button:disabled {
+            opacity: 0.5;
+            background: #aaa !important;
+            cursor: not-allowed;
+        }
+        /* month/year navigation specific */
+        .flex.justify-between.items-center.mb-4 button {
+            background: white;
+            border: 2px solid black;
+            font-weight: bold;
+        }
+        .flex.justify-between.items-center.mb-4 button:hover {
+            background: black;
+            color: white;
+        }
+        /* choghadiya table brutalist */
+        .overflow-x-auto.card {
+            border: 2px solid black;
+            background: white;
+        }
+        .text-green-600 {
+            color: #006400 !important;
+            font-weight: bold;
+        }
+        .text-red-600 {
+            color: #b91c1c !important;
+            font-weight: bold;
+        }
+        /* festival list brutal */
+        .bg-orange-600 {
+            background: black !important;
+            color: #ffaa33 !important;
+            border-bottom: 3px solid #ff2a2a;
+        }
+        /* all inputs and interactive */
+        input, select, textarea {
+            border-radius: 0px !important;
+        }
+        hr {
+            border-top: 2px solid black;
+        }
+        /* extra robust alignment */
+        #main-content {
+            padding-bottom: 1rem;
+        }
+        /* make sure icons not blurred */
+        svg {
+            shape-rendering: crispEdges;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Header brutalist block -->
+        <div class="header-bg">
+            <div class="header-content flex justify-between items-center mb-3">
+                <button onclick="navigate('back')" class="text-white text-2xl font-bold p-1" style="background:transparent!important; border:1px solid white!important;">←</button>
+                <h1 id="header-title" class="text-2xl font-extrabold tracking-tighter">બ્રુટાલિસ્ટ કેલેન્ડર</h1>
+                <div class="w-8"></div>
+            </div>
+            <p id="header-subtitle" class="text-center text-xs font-bold uppercase"></p>
+        </div>
+
+        <div id="main-content" class="p-3 pt-2"></div>
+
+        <!-- Brutal bottom navigation -->
+        <div class="sticky bottom-0 bg-white border-t border-gray-200 p-2 flex justify-around items-center" style="background:#000!important">
+            <button onclick="navigate('daily')" class="flex flex-col items-center p-2 text-xs font-semibold text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>પંચાંગ</span>
+            </button>
+            <button onclick="navigate('calendar')" class="flex flex-col items-center p-2 text-xs font-semibold text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span>કેલેન્ડર</span>
+            </button>
+            <button onclick="navigate('festivals')" class="flex flex-col items-center p-2 text-xs font-semibold text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10m-8-4l8 4m-8-4v.75m8-4v.75"></path></svg>
+                <span>તહેવારો</span>
+            </button>
+            <button onclick="navigate('choghadiya')" class="flex flex-col items-center p-2 text-xs font-semibold text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>ચોઘડિયા</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ---------- BRUTALIST GUJARATI CALENDAR (2001-2030) with Gemini Rashifal ----------
+        const GUJARATI_NUMERALS = ['૦', '૧', '૨', '૩', '૪', '૫', '૬', '૭', '૮', '૯'];
+        const GUJARATI_DAYS = ['રવિવાર', 'સોમવાર', 'મંગળવાર', 'બુધવાર', 'ગુરુવાર', 'શુક્રવાર', 'શનિવાર'];
+        const GUJARATI_MONTHS = ['જાન્યુઆરી', 'ફેબ્રુઆરી', 'માર્ચ', 'એપ્રિલ', 'મે', 'જૂન', 'જુલાઈ', 'ઓગસ્ટ', 'સપ્ટેમ્બર', 'ઓક્ટોબર', 'નવેમ્બર', 'ડિસેમ્બર'];
+
+        function convertToGujarati(number) {
+            return String(number).split('').map(d => GUJARATI_NUMERALS[d] || d).join('');
+        }
+        function getGujaratiDay(date) { return GUJARATI_DAYS[date.getDay()]; }
+        function getGujaratiMonth(date) { return GUJARATI_MONTHS[date.getMonth()]; }
+
+        // Mock Panchang data (consistent for demo across 2001-2030)
+        function getMockPanchangData(date) {
+            const dayOfMonth = date.getDate();
+            const month = date.getMonth();
+            const year = date.getFullYear();
+            const tithis = ['એકમ', 'બીજ', 'ત્રીજ', 'ચોથ', 'પાંચમ', 'છઠ', 'સાતમ', 'આઠમ', 'નોમ', 'દશમ', 'એકાદશી', 'બારસ', 'તેરસ', 'ચૌદસ', 'પૂનમ/અમાસ'];
+            const rashiInfos = ['આજે જન્મેલા બાળકોની રાશિ મેષ (અ, લ, ઈ) છે.', 'આજે જન્મેલા બાળકોની રાશિ વૃષભ (બ, વ, ઉ) છે.', 'આજે જન્મેલા બાળકોની રાશિ મિથુન (ક, છ, ઘ) છે.', 'આજે જન્મેલા બાળકોની રાશિ કર્ક (ડ, હ) છે.', 'આજે જન્મેલા બાળકોની રાશિ સિંહ (મ, ટ) છે.'];
+            const tithiIndex = (dayOfMonth + month + year) % tithis.length;
+            const rashiIndex = (dayOfMonth + month) % rashiInfos.length;
+            return {
+                tithi: tithis[tithiIndex],
+                tithi_time: (dayOfMonth % 12) + 1 + ':30 PM',
+                month: GUJARATI_MONTHS[month],
+                sun_rise: '07:05 AM',
+                sun_set: '06:10 PM',
+                moon_rise: '10:15 AM',
+                moon_set: '09:00 PM',
+                panchak: (dayOfMonth % 5 === 0) ? 'પંચક છે' : 'આજે નથી',
+                vinchhudo: (dayOfMonth % 7 === 1) ? 'વિંછુડો છે' : 'આજે નથી',
+                rashi_inf: rashiInfos[rashiIndex],
+            };
+        }
+
+        // Mock festivals (selected key dates)
+        const FESTIVALS_DB = {
+            '2025-01': [{ date: 14, name: 'મકરસંક્રાંતિ' }, { date: 26, name: 'પ્રજાસત્તાક દિન' }],
+            '2025-03': [{ date: 17, name: 'હોળી' }, { date: 18, name: 'ધૂળેટી' }],
+            '2025-04': [{ date: 6, name: 'રામ નવમી' }, { date: 20, name: 'મહાવીર જયંતિ' }],
+            '2025-08': [{ date: 15, name: 'સ્વતંત્રતા દિન' }, { date: 19, name: 'જન્માષ્ટમી' }],
+            '2025-10': [{ date: 2, name: 'ગાંધી જયંતિ' }, { date: 20, name: 'દશેરા' }],
+            '2025-11': [{ date: 8, name: 'દિવાળી' }, { date: 9, name: 'નૂતન વર્ષ' }],
+            '2026-01': [{ date: 14, name: 'મકરસંક્રાંતિ' }, { date: 26, name: 'પ્રજાસત્તાક દિન' }],
+            '2026-08': [{ date: 15, name: 'સ્વતંત્રતા દિન' }],
+            '2026-11': [{ date: 28, name: 'દિવાળી' }],
+        };
+        
+        const APP_DATA = {
+            rashis: ['મેષ (Aries)', 'વૃષભ (Taurus)', 'મિથુન (Gemini)', 'કર્ક (Cancer)', 'સિંહ (Leo)', 'કન્યા (Virgo)', 'તુલા (Libra)', 'વૃશ્ચિક (Scorpio)', 'ધન (Sagittarius)', 'મકર (Capricorn)', 'કુંભ (Aquarius)', 'મીન (Pisces)'],
+            panchak_vinchhudo_list: [
+                { type: 'પંચક', start: '27/11/2024 (બુધવાર) 04:30 AM', end: '01/12/2024 (રવિવાર) 09:40 AM' },
+                { type: 'વિંછુડો', start: '20/12/2024 (શુક્રવાર) 05:21 PM', end: '22/12/2024 (રવિવાર) 06:20 PM' },
+                { type: 'પંચક', start: '25/12/2024 (બુધવાર) 03:00 PM', end: '30/12/2024 (સોમવાર) 07:45 PM' },
+                { type: 'વિંછુડો', start: '25/01/2025 (શનિવાર) 07:15 AM', end: '27/01/2025 (સોમવાર) 06:50 PM' },
+            ],
+            choghadiya: {
+                day: [{ time: '07:05 થી 08:25', type: 'શુભ' },{ time: '08:25 થી 09:45', type: 'અમૃત' },{ time: '09:45 થી 11:05', type: 'રોગ' },{ time: '11:05 થી 12:25', type: 'લાભ' },{ time: '12:25 થી 01:45', type: 'ઉદ્વેગ' },{ time: '01:45 થી 03:05', type: 'ચલ' },{ time: '03:05 થી 04:25', type: 'કાલ' },{ time: '04:25 થી 05:45', type: 'શુભ' }],
+                night: [{ time: '05:45 થી 07:25', type: 'અમૃત' },{ time: '07:25 થી 09:05', type: 'ચલ' },{ time: '09:05 થી 10:45', type: 'રોગ' },{ time: '10:45 થી 12:25', type: 'કાલ' },{ time: '12:25 થી 02:05', type: 'લાભ' },{ time: '02:05 થી 03:45', type: 'ઉદ્વેગ' },{ time: '03:45 થી 05:25', type: 'શુભ' },{ time: '05:25 થી 07:05', type: 'અમૃત' }]
+            }
+        };
+
+        // state
+        let currentState = {
+            view: 'daily',
+            currentDate: new Date(),
+            selectedDate: new Date(),
+            minYear: 2001,
+            maxYear: 2030,
+        };
+        if (currentState.currentDate.getFullYear() < currentState.minYear) currentState.currentDate = new Date(currentState.minYear, 0, 1);
+        if (currentState.currentDate.getFullYear() > currentState.maxYear) currentState.currentDate = new Date(currentState.maxYear, 0, 1);
+
+        const mainContent = document.getElementById('main-content');
+        const headerTitle = document.getElementById('header-title');
+        const headerSubtitle = document.getElementById('header-subtitle');
+
+        const GEMINI_API_KEY = ""; // keep as is; key injection handled by environment if needed.
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
+
+        async function getRashifal(rashiName) {
+            const resultDiv = document.getElementById('rashifal-result');
+            document.querySelectorAll('.rashi-btn').forEach(btn => btn.disabled = true);
+            const btnId = `rashi-btn-${rashiName.split(' ')[0]}`;
+            const activeBtn = document.getElementById(btnId);
+            if(activeBtn) activeBtn.classList.add('active-rashi');
+            resultDiv.innerHTML = `<p class="text-center font-bold mt-3">⚡ AI ભવિષ્ય લાવે છે: ${rashiName} ⚡</p>`;
+            const userQuery = `તમારા જ્યોતિષના જ્ઞાનનો ઉપયોગ કરીને, ${rashiName} રાશિ માટે આજનો એક સકારાત્મક, ટૂંકો અને પ્રેરક રાશિફળ (prediction) ગુજરાતીમાં માત્ર 80 શબ્દોમાં લખો.`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: "Act as an expert Hindu astrologer, reply in Gujarati, concise, positive, short paragraph." }] } };
+            try {
+                let res = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if(!res.ok) throw new Error('API error');
+                const data = await res.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'માફ કરશો, રાશિફળ જનરેટ થઈ શક્યું નથી.';
+                resultDiv.innerHTML = `<div class="mt-3 p-3 border-l-8 border-black bg-white"><h3 class="text-lg font-black mb-1">${rashiName} — AI ભવિષ્ય</h3><p class="text-base">${text}</p></div>`;
+            } catch(e) {
+                resultDiv.innerHTML = `<p class="text-red-700 font-bold">❗ AI સેવા ઉપલબ્ધ નથી, કૃપા કરી ફરી પ્રયાસ કરો.</p>`;
+            } finally {
+                document.querySelectorAll('.rashi-btn').forEach(btn => btn.disabled = false);
+            }
+        }
+
+        function navigate(view, date = null) {
+            if (date) currentState.selectedDate = date;
+            if (view === 'prev_month') { currentState.currentDate.setMonth(currentState.currentDate.getMonth() - 1); currentState.currentDate = new Date(currentState.currentDate); view = 'calendar'; }
+            else if (view === 'next_month') { currentState.currentDate.setMonth(currentState.currentDate.getMonth() + 1); currentState.currentDate = new Date(currentState.currentDate); view = 'calendar'; }
+            else if (view === 'prev_year') { let ny = currentState.currentDate.getFullYear() - 1; if(ny >= currentState.minYear) currentState.currentDate.setFullYear(ny); view = 'calendar'; }
+            else if (view === 'next_year') { let ny = currentState.currentDate.getFullYear() + 1; if(ny <= currentState.maxYear) currentState.currentDate.setFullYear(ny); view = 'calendar'; }
+            else if (view === 'back') currentState.view = 'daily';
+            else currentState.view = view;
+            renderApp();
+        }
+
+        function renderDailyDetail(date) {
+            const data = getMockPanchangData(date);
+            headerTitle.innerText = 'પંચાંગ · બ્રુટલ';
+            headerSubtitle.innerText = `${getGujaratiDay(date)} | ${convertToGujarati(date.getDate())} ${getGujaratiMonth(date)} ${convertToGujarati(date.getFullYear())}`;
+            mainContent.innerHTML = `
+                <div class="space-y-4 pt-3">
+                    <div class="card p-4"><div class="flex justify-between"><h2 class="text-3xl font-black">${getGujaratiDay(date)}</h2><span class="font-bold">${getGujaratiMonth(date)}</span></div><p class="text-xl font-bold mt-2">તિથિ: ${data.tithi}</p><p class="text-xs">સમય: ${data.tithi_time}</p></div>
+                    <div class="card p-4"><div class="grid grid-cols-2 gap-3 text-center">${renderTimingBox('☀️ સૂર્યોદય', data.sun_rise)}${renderTimingBox('🌅 સૂર્યાસ્ત', data.sun_set)}${renderTimingBox('🌕 ચંદ્રોદય', data.moon_rise)}${renderTimingBox('🌑 ચંદ્રાસ્ત', data.moon_set)}</div></div>
+                    <div class="card p-3 flex justify-around"><div><p class="font-bold">પંચક</p><p class="text-red-700 font-black">${data.panchak}</p></div><div><p class="font-bold">વિંછુડો</p><p class="text-red-700">${data.vinchhudo}</p></div></div>
+                    <div class="card p-3 bg-black text-white"><p class="font-black">✨ રાશિ પ્રવેશ: ${data.rashi_inf}</p></div>
+                    <div class="card p-3"><h3 class="text-xl font-black text-center mb-2">🤖 AI રાશિ ભવિષ્ય</h3><div class="flex flex-wrap justify-center gap-2">${APP_DATA.rashis.map(r => `<button id="rashi-btn-${r.split(' ')[0]}" onclick="getRashifal('${r}')" class="rashi-btn bg-white border-2 border-black px-3 py-1 text-xs font-bold">${r.split(' ')[0]}</button>`).join('')}</div><div id="rashifal-result" class="mt-3"><p class="text-center text-gray-600">રાશિ પસંદ કરો → AI ભવિષ્ય જુઓ</p></div></div>
+                </div>`;
+        }
+        function renderTimingBox(label, time) { return `<div class="border-2 border-black p-2 text-center"><span class="text-2xl block">${label.split(' ')[0]}</span><span class="font-bold">${label}</span><span class="block font-mono">${time}</span></div>`; }
+
+        function renderCalendar() {
+            const year = currentState.currentDate.getFullYear(), month = currentState.currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month+1, 0).getDate();
+            const startDay = firstDay.getDay();
+            const today = new Date();
+            headerTitle.innerText = `${getGujaratiMonth(currentState.currentDate)} ${convertToGujarati(year)}`;
+            headerSubtitle.innerText = 'કઠોર કેલેન્ડર · તહેવારો સાથે';
+            let html = `<div class="flex justify-between items-center my-3"><button onclick="navigate('prev_year')" class="border-2 border-black px-2 py-1 text-xs" ${year<=currentState.minYear?'disabled':''}>&lt;&lt; પાછલું વર્ષ</button><span class="text-xl font-black">${convertToGujarati(year)}</span><button onclick="navigate('next_year')" class="border-2 border-black px-2 py-1 text-xs" ${year>=currentState.maxYear?'disabled':''}>આગામી વર્ષ &gt;&gt;</button></div>
+            <div class="flex justify-between items-center my-2"><button onclick="navigate('prev_month')" class="border-2 border-black px-4 py-1 font-bold">← પાછલો</button><h3 class="text-xl font-black">${getGujaratiMonth(currentState.currentDate)}</h3><button onclick="navigate('next_month')" class="border-2 border-black px-4 py-1 font-bold">આગલો →</button></div>
+            <div class="grid calendar-grid text-center border-2 border-black">${GUJARATI_DAYS.map(d => `<div class="full-day-name">${d.slice(0,2)}</div>`).join('')}</div><div class="grid calendar-grid">`;
+            for(let i=0; i<startDay; i++) html += `<div class="day-cell empty bg-gray-300"></div>`;
+            const monthKey = `${year}-${String(month+1).padStart(2,'0')}`;
+            const fests = FESTIVALS_DB[monthKey] || [];
+            for(let d=1; d<=daysInMonth; d++) {
+                const curDate = new Date(year, month, d);
+                const isToday = curDate.toDateString() === today.toDateString();
+                const festival = fests.find(f=>f.date === d);
+                const panch = getMockPanchangData(curDate).tithi;
+                let cellClass = 'day-cell';
+                if(isToday) cellClass += ' today';
+                if(festival) cellClass += ' festive-day';
+                html += `<div class="${cellClass}" onclick="navigate('daily', new Date(${year}, ${month}, ${d}))"><span class="date-number font-black">${convertToGujarati(d)}</span><span class="tithi-text text-[0.55rem]">${panch}</span>${festival ? `<span class="text-[0.55rem] font-black uppercase">${festival.name.slice(0,12)}</span>` : ''}</div>`;
+            }
+            html += `</div>`;
+            mainContent.innerHTML = html;
+        }
+
+        function renderFestivals() {
+            headerTitle.innerText = 'તહેવારોની યાદી';
+            headerSubtitle.innerText = '૨૦૦૧-૨૦૩૦ (ઉદાહરણ)';
+            let all = [];
+            for(let y=2025; y<=2026; y++) {
+                for(let m=1; m<=12; m++) {
+                    let key = `${y}-${String(m).padStart(2,'0')}`;
+                    if(FESTIVALS_DB[key]) FESTIVALS_DB[key].forEach(f => all.push({date: new Date(y, m-1, f.date), name: f.name}));
+                }
+            }
+            all.sort((a,b)=>a.date-b.date);
+            let html = `<div class="space-y-4 pt-2">`;
+            let lastMonth = '';
+            all.forEach(f => {
+                const mName = getGujaratiMonth(f.date);
+                const yGuj = convertToGujarati(f.date.getFullYear());
+                if(mName !== lastMonth) { html += `<div class="bg-black text-white p-2 text-xl font-black mt-3 border-l-8 border-red-600">${mName} - ${yGuj}</div>`; lastMonth = mName; }
+                html += `<div class="border-2 border-black p-2 flex justify-between"><div><span class="font-black">${convertToGujarati(f.date.getDate())} ${mName}</span><p class="text-red-700 font-bold">${f.name}</p></div><span>${getGujaratiDay(f.date)}</span></div>`;
+            });
+            html += `</div>`;
+            mainContent.innerHTML = html;
+        }
+
+        function renderChoghadiya() {
+            headerTitle.innerText = 'ચોઘડિયા (બ્રુટલ ટેબલ)';
+            headerSubtitle.innerText = 'દિવસ & રાત્રી · દૃષ્ટાંત';
+            let dayHtml = `<div class="border-2 border-black p-2 my-2"><h3 class="font-black text-xl mb-2">☀️ દિવસ ચોઘડિયા</h3><table class="w-full border-collapse"><thead><tr><th class="border border-black p-1">સમય</th><th class="border border-black p-1">શુભતા</th></tr></thead><tbody>${APP_DATA.choghadiya.day.map(slot => `<tr><td class="border border-black p-1">${slot.time}</td><td class="border border-black p-1 font-bold ${slot.type.includes('શુભ')||slot.type.includes('અમૃત')||slot.type.includes('લાભ')?'text-green-800':'text-red-800'}">${slot.type}</td></tr>`).join('')}</tbody></table></div>`;
+            let nightHtml = `<div class="border-2 border-black p-2 my-2"><h3 class="font-black text-xl mb-2">🌙 રાત્રી ચોઘડિયા</h3><table class="w-full border-collapse"><thead><tr><th class="border border-black p-1">સમય</th><th class="border border-black p-1">શુભતા</th></tr></thead><tbody>${APP_DATA.choghadiya.night.map(slot => `<tr><td class="border border-black p-1">${slot.time}</td><td class="border border-black p-1 font-bold ${slot.type.includes('શુભ')||slot.type.includes('અમૃત')||slot.type.includes('લાભ')?'text-green-800':'text-red-800'}">${slot.type}</td></tr>`).join('')}</tbody></table></div>`;
+            mainContent.innerHTML = `<div class="space-y-3 pt-2">${dayHtml}${nightHtml}<div class="border-2 border-black p-3 bg-gray-100 text-sm"><span class="font-black">✧ શુભ: શુભ, અમૃત, લાભ  |  અશુભ: રોગ, ઉદ્વેગ, કાલ ✧</span></div></div>`;
+        }
+
+        function renderApp() {
+            if(currentState.view === 'calendar') renderCalendar();
+            else if(currentState.view === 'festivals') renderFestivals();
+            else if(currentState.view === 'choghadiya') renderChoghadiya();
+            else renderDailyDetail(currentState.selectedDate);
+        }
+
+        window.navigate = navigate;
+        window.getRashifal = getRashifal;
+        window.onload = () => { renderApp(); };
+    </script>
+</body>
+</html>

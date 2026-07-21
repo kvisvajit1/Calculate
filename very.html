@@ -1,0 +1,2918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>VishuXpay · Offline</title>
+
+    <!-- jsQR from CDN (cached after first load) -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js">
+    </script>
+
+    <style>
+        /* ──────────────────────────────────────────────────────────────
+           ROOT VARIABLES & RESET – Light Theme Only
+        ────────────────────────────────────────────────────────────── */
+        :root {
+            --bg-primary: #f0f2f8;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.60);
+            --bg-card-hover: rgba(255, 255, 255, 0.80);
+            --bg-nav: rgba(255, 255, 255, 0.72);
+            --bg-input: rgba(255, 255, 255, 0.80);
+            --text-primary: #1c1c1e;
+            --text-secondary: #6c6c70;
+            --text-muted: #8e8e93;
+            --border-color: rgba(60, 60, 67, 0.08);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.10);
+            --radius: 28px;
+            --radius-sm: 16px;
+            --radius-xs: 12px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --gradient-primary: linear-gradient(135deg, #6C63FF 0%, #5a52d5 100%);
+            --gradient-accent: linear-gradient(135deg, #FF6584 0%, #e85572 100%);
+            --glass-blur: blur(25px);
+            --glass-border: rgba(255, 255, 255, 0.50);
+            --safe-bottom: env(safe-area-inset-bottom, 12px);
+            --btn-shadow: 0 4px 16px rgba(108, 99, 255, 0.30);
+            --btn-shadow-hover: 0 6px 24px rgba(108, 99, 255, 0.40);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 12px;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            max-height: 860px;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-secondary);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: 32px;
+            box-shadow: var(--shadow-lg), 0 0 0 1px var(--glass-border);
+            overflow: hidden;
+            transition: background var(--transition), box-shadow var(--transition);
+            position: relative;
+            animation: appEntry 0.6s var(--transition-bounce);
+        }
+
+        @keyframes appEntry {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* ─── SCROLLBAR ─── */
+        ::-webkit-scrollbar {
+            width: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 10px;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            padding: 16px 20px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.30);
+            transition: all var(--transition);
+        }
+        .header-brand .logo:hover {
+            transform: rotate(-5deg) scale(1.05);
+        }
+        .header-brand h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .header-btn:hover {
+            transform: scale(1.05);
+            background: var(--bg-card-hover);
+        }
+        .header-btn:active {
+            transform: scale(0.92);
+        }
+        .header-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            transition: transform var(--transition);
+        }
+        .header-btn:hover svg {
+            transform: rotate(20deg);
+        }
+
+        /* ─── BALANCE CARD ─── */
+        .balance-card {
+            margin: 4px 16px 14px;
+            padding: 20px 24px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 28px rgba(108, 99, 255, 0.25);
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: all var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+            animation: orbFloat 8s ease-in-out infinite;
+        }
+        .balance-card::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -10%;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+            animation: orbFloat 10s ease-in-out infinite reverse;
+        }
+        @keyframes orbFloat {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(20px, -20px) scale(1.1);
+            }
+            66% {
+                transform: translate(-10px, 10px) scale(0.9);
+            }
+        }
+        .balance-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .balance-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .balance-actions button {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .balance-actions button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        .balance-actions button:active {
+            transform: scale(0.94);
+        }
+        .balance-actions button svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+        .balance-amount {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 2px 0 4px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -1px;
+            transition: all 0.3s;
+        }
+        .balance-amount.pulse {
+            animation: amountPulse 0.4s var(--transition-bounce);
+        }
+        @keyframes amountPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.04);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .balance-sub {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .balance-sub span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .balance-sub svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* ─── CONTENT ─── */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px 8px;
+            scroll-behavior: smooth;
+        }
+
+        .screen {
+            display: none;
+            animation: screenIn 0.4s var(--transition-bounce);
+        }
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes screenIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ─── CARDS ─── */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+            transition: all var(--transition);
+        }
+        .card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-title .title-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-title .title-left svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        .card-title .action-link {
+            font-size: 0.7rem;
+            text-transform: none;
+            color: #6C63FF;
+            cursor: pointer;
+            font-weight: 500;
+            background: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all var(--transition);
+        }
+        .card-title .action-link:hover {
+            background: rgba(108, 99, 255, 0.08);
+            transform: translateX(2px);
+        }
+
+        /* ─── QUICK ACTIONS ─── */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .quick-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 4px;
+            border-radius: var(--radius-sm);
+            background: rgba(108, 99, 255, 0.05);
+            cursor: pointer;
+            transition: all var(--transition);
+            border: none;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.7rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+        .quick-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+            background: rgba(108, 99, 255, 0.08);
+        }
+        .quick-item:active {
+            transform: scale(0.94);
+        }
+        .quick-item .icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+        .quick-item .icon svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            transition: transform var(--transition);
+        }
+        .quick-item:hover .icon svg {
+            transform: scale(1.10) rotate(-4deg);
+        }
+        .quick-item .icon-purple {
+            background: rgba(108, 99, 255, 0.15);
+            color: #6C63FF;
+        }
+        .quick-item .icon-green {
+            background: rgba(52, 199, 89, 0.12);
+            color: #34c759;
+        }
+        .quick-item .icon-pink {
+            background: rgba(255, 101, 132, 0.12);
+            color: #FF6584;
+        }
+
+        /* ─── BUTTONS ─── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all var(--transition);
+            font-family: inherit;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+            min-height: 52px;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0);
+            transition: background var(--transition);
+        }
+        .btn:hover::after {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn:active::after {
+            background: rgba(255, 255, 255, 0.15);
+            transition: background 0.05s;
+        }
+        .btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            flex-shrink: 0;
+            transition: transform var(--transition);
+        }
+        .btn:hover svg {
+            transform: translateX(2px) scale(1.05);
+        }
+        .btn-primary {
+            background: var(--gradient-primary);
+            box-shadow: var(--btn-shadow);
+        }
+        .btn-primary:hover {
+            box-shadow: var(--btn-shadow-hover);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .btn-success {
+            background: var(--gradient-accent);
+            box-shadow: 0 4px 16px rgba(255, 101, 132, 0.30);
+        }
+        .btn-success:hover {
+            box-shadow: 0 6px 24px rgba(255, 101, 132, 0.45);
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #ff3b30;
+            box-shadow: 0 4px 16px rgba(255, 59, 48, 0.25);
+        }
+        .btn-danger:hover {
+            box-shadow: 0 6px 24px rgba(255, 59, 48, 0.40);
+            transform: translateY(-2px);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+        .btn-ghost:hover {
+            background: var(--bg-card);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            transform: none !important;
+        }
+
+        /* ─── INPUT ─── */
+        .input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            transition: all var(--transition);
+            font-family: inherit;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .input:focus {
+            border-color: #6C63FF;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.10);
+            transform: translateY(-1px);
+        }
+        .input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ─── TRANSACTIONS ─── */
+        .tx-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition);
+            border-radius: var(--radius-xs);
+        }
+        .tx-item:hover {
+            background: var(--bg-card-hover);
+            padding: 10px 12px;
+            margin: 0 -12px;
+            border-radius: var(--radius-xs);
+            border-bottom-color: transparent;
+        }
+        .tx-item:active {
+            transform: scale(0.98);
+        }
+        .tx-item:last-child {
+            border-bottom: none;
+        }
+        .tx-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .tx-icon-sent {
+            background: rgba(255, 59, 48, 0.10);
+            color: #ff3b30;
+        }
+        .tx-icon-received {
+            background: rgba(52, 199, 89, 0.10);
+            color: #34c759;
+        }
+        .tx-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        .tx-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .tx-info .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .tx-info .meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .tx-amount {
+            font-weight: 700;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        .tx-amount-sent {
+            color: #ff3b30;
+        }
+        .tx-amount-received {
+            color: #34c759;
+        }
+
+        /* ─── QR CONTAINER ─── */
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            background: #fff;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow);
+            margin: 8px auto;
+            max-width: 100%;
+            overflow: hidden;
+            transition: all var(--transition);
+            animation: qrPop 0.4s var(--transition-bounce);
+        }
+        @keyframes qrPop {
+            from {
+                opacity: 0;
+                transform: scale(0.8) rotate(-3deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+        .qr-container canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .qr-container .qr-placeholder {
+            padding: 30px 16px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        /* ─── FULL SCREEN SCANNER ─── */
+        .scanner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            animation: scannerSlideUp 0.4s var(--transition-bounce);
+        }
+        .scanner-overlay.active {
+            display: flex;
+        }
+        @keyframes scannerSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .scanner-overlay video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .scanner-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.50) 0%, transparent 100%);
+        }
+        .scanner-header .scanner-title {
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .scanner-header .btn-close {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .scanner-header .btn-close:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        .scanner-header .btn-close svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+        .scan-overlay-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 260px;
+            height: 260px;
+            border: 2px solid rgba(255, 255, 255, 0.80);
+            border-radius: 20px;
+            box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.45);
+            pointer-events: none;
+            z-index: 5;
+            animation: pulseBorder 1.8s ease-in-out infinite;
+        }
+        .scan-overlay-center::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #6C63FF;
+            border-radius: 2px;
+            animation: scanLine 2s ease-in-out infinite;
+        }
+        @keyframes scanLine {
+            0%,
+            100% {
+                top: -2px;
+            }
+            50% {
+                top: calc(100% + 2px);
+            }
+        }
+        @keyframes pulseBorder {
+            0%,
+            100% {
+                border-color: rgba(255, 255, 255, 0.70);
+                box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.40);
+            }
+            50% {
+                border-color: rgba(255, 255, 255, 0.30);
+                box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.30);
+            }
+        }
+        .scanner-footer {
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+            padding: 0 20px;
+        }
+        .scanner-footer .btn {
+            flex: 1;
+            max-width: 160px;
+            padding: 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            min-height: 48px;
+        }
+        .scanner-footer .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .scanner-footer .btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* ─── BOTTOM NAV ─── */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 8px calc(8px + var(--safe-bottom));
+            background: var(--bg-nav);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border);
+            flex-shrink: 0;
+            transition: all var(--transition);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition);
+            padding: 4px 12px;
+            border-radius: 12px;
+            user-select: none;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            gap: 2px;
+            min-width: 52px;
+            position: relative;
+        }
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            border-radius: 2px;
+            background: #6C63FF;
+            transition: width var(--transition);
+        }
+        .nav-item.active::after {
+            width: 20px;
+        }
+        .nav-item:hover {
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+        .nav-item.active {
+            color: #6C63FF;
+        }
+        .nav-item .nav-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-item .nav-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+            transition: transform var(--transition);
+        }
+        .nav-item:hover .nav-icon svg {
+            transform: translateY(-2px) scale(1.05);
+        }
+        .nav-item .nav-label {
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        .nav-item.active .nav-label {
+            font-weight: 600;
+        }
+
+        /* ─── TOAST ─── */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            z-index: 999;
+            box-shadow: var(--shadow-lg);
+            animation: toastIn 0.4s var(--transition-bounce), toastOut 0.4s 2.5s var(--transition-bounce) forwards;
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+            transition: all var(--transition);
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px) scale(0.90);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px) scale(0.90);
+            }
+        }
+
+        /* ─── CONTACTS / PROFILE ─── */
+        .contact-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: all var(--transition);
+        }
+        .contact-avatar:hover {
+            transform: scale(1.10);
+        }
+        .profile-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 8px 0;
+        }
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(108, 99, 255, 0.20);
+            transition: all var(--transition);
+        }
+        .profile-avatar:hover {
+            transform: scale(1.05) rotate(-4deg);
+        }
+        .profile-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .profile-info .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .profile-info .sub {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition);
+            border-radius: var(--radius-xs);
+        }
+        .settings-item:hover {
+            background: var(--bg-card-hover);
+            transform: translateX(4px);
+        }
+        .settings-item:active {
+            transform: scale(0.98);
+        }
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        .settings-item .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .settings-item .left .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+        }
+        .settings-item .left .icon svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            transition: transform var(--transition);
+        }
+        .settings-item:hover .left .icon svg {
+            transform: rotate(10deg) scale(1.10);
+        }
+        .settings-item .left .label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .settings-item .right {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: transform var(--transition);
+        }
+        .settings-item:hover .right {
+            transform: translateX(4px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--text-muted);
+        }
+        .empty-state .icon {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+            opacity: 0.4;
+        }
+        .empty-state .icon svg {
+            width: 48px;
+            height: 48px;
+            fill: currentColor;
+            animation: emptyFloat 3s ease-in-out infinite;
+        }
+        @keyframes emptyFloat {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+        .empty-state .title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .empty-state .desc {
+            font-size: 0.8rem;
+        }
+
+        .contact-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px 4px 8px;
+            border-radius: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .contact-chip:hover {
+            transform: scale(1.05);
+            background: var(--bg-card-hover);
+        }
+        .contact-chip:active {
+            transform: scale(0.94);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            #app {
+                border-radius: 0;
+                max-height: 100vh;
+                height: 100vh;
+                max-width: 100%;
+            }
+            .header-brand h1 {
+                font-size: 1.1rem;
+            }
+            .balance-amount {
+                font-size: 2.2rem;
+            }
+            .quick-grid {
+                gap: 6px;
+            }
+            .quick-item {
+                padding: 10px 2px;
+                font-size: 0.6rem;
+            }
+            .quick-item .icon {
+                width: 38px;
+                height: 38px;
+            }
+            .quick-item .icon svg {
+                width: 20px;
+                height: 20px;
+            }
+            .scan-overlay-center {
+                width: 200px;
+                height: 200px;
+            }
+            .qr-container canvas {
+                max-width: 160px;
+            }
+        }
+        @media (max-height: 700px) {
+            .balance-card {
+                padding: 14px 18px;
+                margin: 4px 14px 10px;
+            }
+            .balance-amount {
+                font-size: 1.8rem;
+            }
+            .quick-item {
+                padding: 6px 2px;
+            }
+            .quick-item .icon {
+                width: 32px;
+                height: 32px;
+            }
+            .quick-item .icon svg {
+                width: 18px;
+                height: 18px;
+            }
+            .card {
+                padding: 12px 14px;
+                margin-bottom: 10px;
+            }
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+                min-height: 44px;
+            }
+            .scan-overlay-center {
+                width: 160px;
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- ─── HEADER ─── -->
+        <header class="header">
+            <div class="header-brand">
+                <div class="logo">V</div>
+                <h1>VishuXpay</h1>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" id="profileBtn" aria-label="Profile">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- ─── BALANCE CARD ─── -->
+        <div class="balance-card" id="balanceCard">
+            <div class="balance-top">
+                <div></div>
+                <div class="balance-actions">
+                    <button id="refreshBalanceBtn">
+                        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4C7.58 4 4.01 7.58 4.01 12S7.58 20 12 20c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="balance-amount" id="balanceDisplay">₹2,89,850</div>
+            <div class="balance-sub">
+                <span>
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <span id="userNameDisplay">User</span>
+                </span>
+                <span>
+                    <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    Local
+                </span>
+            </div>
+        </div>
+
+        <!-- ─── CONTENT ─── -->
+        <div class="content">
+
+            <!-- ═══ HOME ═══ -->
+            <div id="homeScreen" class="screen active">
+                <div class="card">
+                    <div class="quick-grid">
+                        <button class="quick-item" data-tab="send">
+                            <div class="icon icon-purple">
+                                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                            </div>
+                            <span>Send</span>
+                        </button>
+                        <button class="quick-item" data-tab="receive">
+                            <div class="icon icon-green">
+                                <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                            </div>
+                            <span>Receive</span>
+                        </button>
+                        <button class="quick-item" data-tab="history">
+                            <div class="icon icon-pink">
+                                <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.23-3.5-2.08V8H12z"/></svg>
+                            </div>
+                            <span>History</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <span class="title-left">
+                            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.08V8H12z"/></svg>
+                            Recent
+                        </span>
+                    </div>
+                    <div id="recentList">
+                        <div class="empty-state">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg>
+                            </div>
+                            <div class="title">No transactions</div>
+                            <div class="desc">Send or receive tokens</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ SEND ═══ -->
+            <div id="sendScreen" class="screen">
+                <div class="card">
+                    <button class="btn btn-primary" id="scanReceiveQRBtn">
+                        <svg viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-1c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+                        Scan
+                    </button>
+
+                    <div id="sendConfirmArea" style="display:none; margin-top:12px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding:8px 12px; background:var(--bg-card); border-radius:var(--radius-xs);">
+                            <span style="color:var(--text-muted);font-size:0.85rem;">Paying</span>
+                            <strong id="sendToUser" style="font-size:1rem;">—</strong>
+                        </div>
+                        <input type="number" class="input" id="sendAmount" placeholder="Amount" min="1" />
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                            <button class="btn btn-success" id="confirmSendBtn">
+                                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                Pay
+                            </button>
+                            <button class="btn btn-secondary" id="cancelSendBtn">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div id="sendQRDisplay" style="display:none; text-align:center; margin-top:12px;">
+                        <p style="margin-bottom:6px; font-weight:500; font-size:0.9rem;">Show to receiver</p>
+                        <div id="sendPaymentQR" class="qr-container">
+                            <div class="qr-placeholder">Generating…</div>
+                        </div>
+                        <button class="btn btn-secondary" id="doneSendBtn" style="margin-top:8px;">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Done
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ RECEIVE ═══ -->
+            <div id="receiveScreen" class="screen">
+                <div class="card">
+                    <button class="btn btn-primary" id="generateRequestBtn">
+                        <svg viewBox="0 0 24 24"><path d="M3 9h4V5H3v4zm0 5h4v-4H3v4zm5 0h4v-4H8v4zm5 0h4v-4h-4v4zM8 9h4V5H8v4zm5-4v4h4V5h-4zm5 9h4v-4h-4v4zM3 19h4v-4H3v4zm5 0h4v-4H8v4zm5 0h4v-4h-4v4zm5 0h4v-4h-4v4zm0-14v4h4V5h-4z"/></svg>
+                        Request
+                    </button>
+
+                    <div id="receiveRequestArea" style="display:none; text-align:center; margin-top:12px;">
+                        <p style="margin-bottom:6px; font-weight:500; font-size:0.9rem;">Ask sender to scan</p>
+                        <div id="receiveRequestQR" class="qr-container">
+                            <div class="qr-placeholder">Generating…</div>
+                        </div>
+                        <button class="btn btn-secondary" id="scanPaymentQRBtn" style="margin-top:8px;">
+                            <svg viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-1c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>
+                            Scan
+                        </button>
+                    </div>
+
+                    <div id="receiveResult" style="display:none; text-align:center; margin-top:10px; padding:14px; background:rgba(52,199,89,0.08); border-radius:var(--radius-sm); animation: resultPop 0.4s var(--transition-bounce);">
+                        <div style="font-size:2rem;">✓</div>
+                        <div style="font-weight:600;color:#34c759;" id="receiveResultText">Received!</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ HISTORY ═══ -->
+            <div id="historyScreen" class="screen">
+                <div class="card">
+                    <div class="card-title">
+                        <span class="title-left">
+                            <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                            History
+                        </span>
+                        <button class="action-link" id="searchToggleBtn" style="background:none;border:none;cursor:pointer;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        </button>
+                    </div>
+                    <div id="searchBox" style="display:none; margin-bottom:10px;">
+                        <input class="input" id="historySearch" placeholder="Search…" style="font-size:0.85rem;padding:10px 14px;" />
+                    </div>
+                    <div id="historyList">
+                        <div class="empty-state">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg>
+                            </div>
+                            <div class="title">No transactions</div>
+                            <div class="desc">Your token history</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ PROFILE ═══ -->
+            <div id="profileScreen" class="screen">
+                <div class="card">
+                    <div class="profile-row">
+                        <div class="profile-avatar" id="profileAvatar">U</div>
+                        <div class="profile-info">
+                            <div class="name" id="profileName">User</div>
+                            <div class="sub">🔐 Wallet active</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px; display:flex; gap:8px;">
+                        <input class="input" id="editUsernameInput" placeholder="Username" style="font-size:0.85rem;padding:10px 14px;" />
+                        <button class="btn btn-primary" id="saveUsernameBtn" style="width:auto;padding:10px 18px;font-size:0.85rem;">Save</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="settings-item" id="contactsManageBtn">
+                        <div class="left">
+                            <span class="icon">
+                                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                            </span>
+                            <span class="label">Contacts</span>
+                        </div>
+                        <span class="right">→</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══ CONTACTS ═══ -->
+            <div id="contactsScreen" class="screen">
+                <div class="card">
+                    <div class="card-title">
+                        <span class="title-left">
+                            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                            Contacts
+                        </span>
+                        <button class="action-link" id="backFromContacts">← Back</button>
+                    </div>
+                    <div style="display:flex; gap:6px; margin-bottom:10px;">
+                        <input class="input" id="addContactInput" placeholder="Add by name" style="font-size:0.8rem;padding:10px 14px;" />
+                        <button class="btn btn-primary" id="addContactBtn" style="width:auto;padding:10px 16px;font-size:0.8rem;">Add</button>
+                    </div>
+                    <div id="contactsList">
+                        <div class="empty-state">
+                            <div class="icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="title">No contacts</div>
+                            <div class="desc">Add or transact to save</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── BOTTOM NAV ─── -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="home">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                </span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" data-tab="send">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </span>
+                <span class="nav-label">Send</span>
+            </button>
+            <button class="nav-item" data-tab="receive">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                </span>
+                <span class="nav-label">Receive</span>
+            </button>
+            <button class="nav-item" data-tab="history">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.23-3.5-2.08V8H12z"/></svg>
+                </span>
+                <span class="nav-label">History</span>
+            </button>
+            <button class="nav-item" data-tab="profile">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </span>
+                <span class="nav-label">Profile</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ─── FULL SCREEN SCANNER OVERLAY ─── -->
+    <div class="scanner-overlay" id="scannerOverlay">
+        <video id="scannerVideo" autoplay playsinline></video>
+        <div class="scanner-header">
+            <span class="scanner-title">Scan QR</span>
+            <button class="btn-close" id="scannerCloseBtn">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+        <div class="scan-overlay-center"></div>
+        <div class="scanner-footer">
+            <button class="btn" id="scannerTorchBtn">
+                <svg viewBox="0 0 24 24"><path d="M6 2h12v3H6zm0 5h12v3H6zm0 5h12v3H6zm0 5h12v3H6z"/></svg>
+                Torch
+            </button>
+            <button class="btn" id="scannerCancelBtn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!--  QR CODE GENERATOR  –  self‑contained                        -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <script>
+        // ─── QRCodeCore – fully offline QR generation ───
+        const QRCodeCore = (function() {
+            class QRMath {
+                static init() {
+                    if (QRMath._initialized) return;
+                    QRMath.EXP_TABLE = new Array(256);
+                    QRMath.LOG_TABLE = new Array(256);
+                    for (let i = 0; i < 8; i++) QRMath.EXP_TABLE[i] = 1 << i;
+                    for (let i = 8; i < 256; i++) {
+                        QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4] ^
+                            QRMath.EXP_TABLE[i - 5] ^
+                            QRMath.EXP_TABLE[i - 6] ^
+                            QRMath.EXP_TABLE[i - 8];
+                    }
+                    for (let i = 0; i < 255; i++) QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
+                    QRMath._initialized = true;
+                }
+                static glog(n) { if (n < 1) throw new Error('glog(' + n + ')'); return QRMath.LOG_TABLE[n]; }
+                static gexp(n) { while (n < 0) n += 255; while (n >= 256) n -= 255; return QRMath.EXP_TABLE[n]; }
+            }
+
+            class QRPolynomial {
+                constructor(num, shift) {
+                    if (num.length === undefined) throw new Error(num.length + '/' + shift);
+                    let offset = 0;
+                    while (offset < num.length && num[offset] === 0) offset++;
+                    this.num = new Array(num.length - offset + shift);
+                    for (let i = 0; i < num.length - offset; i++) this.num[i] = num[offset + i];
+                }
+                get(index) { return this.num[index]; }
+                getLength() { return this.num.length; }
+                multiply(e) {
+                    let num = new Array(this.getLength() + e.getLength() - 1);
+                    for (let i = 0; i < this.getLength(); i++) {
+                        for (let j = 0; j < e.getLength(); j++) {
+                            num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
+                        }
+                    }
+                    return new QRPolynomial(num, 0);
+                }
+                mod(e) {
+                    if (this.getLength() - e.getLength() < 0) return this;
+                    let ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
+                    let num = new Array(this.getLength());
+                    for (let i = 0; i < this.getLength(); i++) num[i] = this.get(i);
+                    for (let i = 0; i < e.getLength(); i++) {
+                        num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
+                    }
+                    return new QRPolynomial(num, 0).mod(e);
+                }
+            }
+
+            const PAD0 = 0xEC,
+                PAD1 = 0x11;
+            let _typeNumber, _errorCorrectLevel, _qrDataList, _modules, _moduleCount, _dataCache;
+            const QRErrorCorrectLevel = { L: 1, M: 0, Q: 3, H: 2 };
+
+            class QRCodeModel {
+                constructor(typeNumber, errorCorrectLevel) {
+                    _typeNumber = typeNumber;
+                    _errorCorrectLevel = errorCorrectLevel;
+                    _qrDataList = [];
+                    _modules = null;
+                    _moduleCount = 0;
+                    _dataCache = null;
+                }
+                addData(data) { _qrDataList.push(new QR8BitByte(data));
+                    _dataCache = null; }
+                isDark(row, col) { if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) throw new Error(row +
+                        ',' + col); return _modules[row][col]; }
+                getModuleCount() { return _moduleCount; }
+                make() { makeImpl(false, getBestMaskPattern()); }
+                getBestMaskPattern() {
+                    let minLostPoint = 0,
+                        pattern = 0;
+                    for (let i = 0; i < 8; i++) { makeImpl(true, i); let lostPoint = QRUtil.getLostPoint(this); if (i === 0 ||
+                            minLostPoint > lostPoint) { minLostPoint = lostPoint;
+                            pattern = i; } }
+                    return pattern;
+                }
+            }
+
+            function makeImpl(test, maskPattern) {
+                _moduleCount = _typeNumber * 4 + 17;
+                _modules = new Array(_moduleCount);
+                for (let row = 0; row < _moduleCount; row++) { _modules[row] = new Array(_moduleCount); for (let col = 0; col <
+                        _moduleCount; col++) _modules[row][col] = null; }
+                setupPositionProbePattern(0, 0);
+                setupPositionProbePattern(_moduleCount - 7, 0);
+                setupPositionProbePattern(0, _moduleCount - 7);
+                setupPositionAdjustPattern();
+                setupTimingPattern();
+                setupTypeInfo(test, maskPattern);
+                if (_typeNumber >= 7) setupTypeNumber(test);
+                if (!_dataCache) _dataCache = QRUtil.createData(_typeNumber, _errorCorrectLevel, _qrDataList);
+                mapData(_dataCache, maskPattern);
+            }
+
+            function setupPositionProbePattern(row, col) {
+                for (let r = -1; r <= 7; r++) {
+                    if (row + r <= -1 || _moduleCount <= row + r) continue;
+                    for (let c = -1; c <= 7; c++) {
+                        if (col + c <= -1 || _moduleCount <= col + c) continue;
+                        if ((0 <= r && r <= 6 && (c === 0 || c === 6)) ||
+                            (0 <= c && c <= 6 && (r === 0 || r === 6)) ||
+                            (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+                            _modules[row + r][col + c] = true;
+                        } else {
+                            _modules[row + r][col + c] = false;
+                        }
+                    }
+                }
+            }
+
+            function setupTimingPattern() {
+                for (let r = 8; r < _moduleCount - 8; r++) { if (_modules[r][6] !== null) continue;
+                    _modules[r][6] = (r % 2 === 0); }
+                for (let c = 8; c < _moduleCount - 8; c++) { if (_modules[6][c] !== null) continue;
+                    _modules[6][c] = (c % 2 === 0); }
+            }
+
+            function setupPositionAdjustPattern() {
+                let pos = QRUtil.getPatternPosition(_typeNumber);
+                for (let i = 0; i < pos.length; i++) {
+                    for (let j = 0; j < pos.length; j++) {
+                        let row = pos[i],
+                            col = pos[j];
+                        if (_modules[row][col] !== null) continue;
+                        for (let r = -2; r <= 2; r++) {
+                            for (let c = -2; c <= 2; c++) {
+                                if (r === -2 || r === 2 || c === -2 || c === 2 || (r === 0 && c === 0)) {
+                                    _modules[row + r][col + c] = true;
+                                } else {
+                                    _modules[row + r][col + c] = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            function setupTypeNumber(test) {
+                let bits = QRUtil.getBCHTypeNumber(_typeNumber);
+                for (let i = 0; i < 18; i++) {
+                    let mod = (!test && ((bits >> i) & 1) === 1);
+                    _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+                }
+                for (let i = 0; i < 18; i++) {
+                    let mod = (!test && ((bits >> i) & 1) === 1);
+                    _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+                }
+            }
+
+            function setupTypeInfo(test, maskPattern) {
+                let data = (_errorCorrectLevel << 3) | maskPattern;
+                let bits = QRUtil.getBCHTypeInfo(data);
+                for (let i = 0; i < 15; i++) {
+                    let mod = (!test && ((bits >> i) & 1) === 1);
+                    if (i < 6) _modules[i][8] = mod;
+                    else if (i < 8) _modules[i + 1][8] = mod;
+                    else _modules[_moduleCount - 15 + i][8] = mod;
+                }
+                for (let i = 0; i < 15; i++) {
+                    let mod = (!test && ((bits >> i) & 1) === 1);
+                    if (i < 8) _modules[8][_moduleCount - i - 1] = mod;
+                    else if (i < 9) _modules[8][15 - i - 1 + 1] = mod;
+                    else _modules[8][15 - i - 1] = mod;
+                }
+                _modules[_moduleCount - 8][8] = !test;
+            }
+
+            function mapData(data, maskPattern) {
+                let inc = -1,
+                    row = _moduleCount - 1,
+                    bitIndex = 7,
+                    byteIndex = 0;
+                let maskFunc = QRUtil.getMaskFunction(maskPattern);
+                for (let col = _moduleCount - 1; col > 0; col -= 2) {
+                    if (col === 6) col--;
+                    while (true) {
+                        for (let c = 0; c < 2; c++) {
+                            if (_modules[row][col - c] === null) {
+                                let dark = false;
+                                if (byteIndex < data.length) { dark = ((data[byteIndex] >>> bitIndex) & 1) === 1; }
+                                let mask = maskFunc(row, col - c);
+                                if (mask) dark = !dark;
+                                _modules[row][col - c] = dark;
+                                bitIndex--;
+                                if (bitIndex === -1) { byteIndex++;
+                                    bitIndex = 7; }
+                            }
+                        }
+                        row += inc;
+                        if (row < 0 || _moduleCount <= row) { row -= inc;
+                            inc = -inc; break; }
+                    }
+                }
+            }
+
+            function getBestMaskPattern() {
+                let qr = new QRCodeModel(_typeNumber, _errorCorrectLevel);
+                qr._qrDataList = _qrDataList;
+                return qr.getBestMaskPattern();
+            }
+
+            class QR8BitByte {
+                constructor(data) {
+                    this.mode = 4;
+                    this.data = data;
+                    this.parsedData = [];
+                    for (let i = 0, l = data.length; i < l; i++) {
+                        let byteArray = [];
+                        let code = data.charCodeAt(i);
+                        if (code > 0x10000) {
+                            byteArray[0] = 0xF0 | ((code & 0x1C0000) >>> 18);
+                            byteArray[1] = 0x80 | ((code & 0x3F000) >>> 12);
+                            byteArray[2] = 0x80 | ((code & 0xFC0) >>> 6);
+                            byteArray[3] = 0x80 | (code & 0x3F);
+                        } else if (code > 0x800) {
+                            byteArray[0] = 0xE0 | ((code & 0xF000) >>> 12);
+                            byteArray[1] = 0x80 | ((code & 0xFC0) >>> 6);
+                            byteArray[2] = 0x80 | (code & 0x3F);
+                        } else if (code > 0x80) {
+                            byteArray[0] = 0xC0 | ((code & 0x7C0) >>> 6);
+                            byteArray[1] = 0x80 | (code & 0x3F);
+                        } else {
+                            byteArray[0] = code;
+                        }
+                        this.parsedData.push.apply(this.parsedData, byteArray);
+                    }
+                    if (this.parsedData.length !== this.getLength()) {
+                        this.parsedData.unshift(191);
+                        this.parsedData.unshift(187);
+                        this.parsedData.unshift(239);
+                    }
+                }
+                getLength() { return this.parsedData.length; }
+                write(buffer) { for (let i = 0, l = this.parsedData.length; i < l; i++) buffer.put(this.parsedData[i],
+                    8); }
+            }
+
+            class QRBitBuffer {
+                constructor() { this.buffer = [];
+                    this.length = 0; }
+                get(index) { let bufIndex = Math.floor(index / 8); return ((this.buffer[bufIndex] >>> (7 - index % 8)) &
+                        1) === 1; }
+                put(num, length) { for (let i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) ===
+                    1); }
+                getLengthInBits() { return this.length; }
+                putBit(bit) {
+                    let bufIndex = Math.floor(this.length / 8);
+                    if (this.buffer.length <= bufIndex) this.buffer.push(0);
+                    if (bit) this.buffer[bufIndex] |= (0x80 >>> (this.length % 8));
+                    this.length++;
+                }
+            }
+
+            const QRUtil = {
+                PATTERN_POSITION_TABLE: [
+                    [],
+                    [6, 18],
+                    [6, 22],
+                    [6, 26],
+                    [6, 30],
+                    [6, 34],
+                    [6, 22, 38],
+                    [6, 24, 42],
+                    [6, 26, 46],
+                    [6, 28, 50],
+                    [6, 30, 54],
+                    [6, 32, 58],
+                    [6, 34, 62],
+                    [6, 26, 46, 66],
+                    [6, 26, 48, 70],
+                    [6, 26, 50, 74],
+                    [6, 30, 54, 78],
+                    [6, 30, 56, 82],
+                    [6, 30, 58, 86],
+                    [6, 34, 62, 90],
+                    [6, 28, 50, 72, 94],
+                    [6, 26, 50, 74, 98],
+                    [6, 30, 54, 78, 102],
+                    [6, 28, 54, 80, 106],
+                    [6, 32, 58, 84, 110],
+                    [6, 30, 58, 86, 114],
+                    [6, 34, 62, 90, 118],
+                    [6, 26, 50, 74, 98, 122],
+                    [6, 30, 54, 78, 102, 126],
+                    [6, 26, 52, 78, 104, 130],
+                    [6, 30, 56, 82, 108, 134],
+                    [6, 34, 60, 86, 112, 138],
+                    [6, 30, 58, 86, 114, 142],
+                    [6, 34, 62, 90, 118, 146],
+                    [6, 30, 54, 78, 102, 126, 150],
+                    [6, 24, 50, 76, 102, 128, 154],
+                    [6, 28, 54, 80, 106, 132, 158],
+                    [6, 32, 58, 84, 110, 136, 162],
+                    [6, 26, 54, 82, 110, 138, 166],
+                    [6, 30, 58, 86, 114, 142, 170]
+                ],
+                G15: (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
+                G18: (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
+                G15_MASK: (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1),
+                getBCHTypeInfo(data) {
+                    let d = data << 10;
+                    while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
+                        d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15)));
+                    }
+                    return ((data << 10) | d) ^ QRUtil.G15_MASK;
+                },
+                getBCHTypeNumber(data) {
+                    let d = data << 12;
+                    while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
+                        d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18)));
+                    }
+                    return (data << 12) | d;
+                },
+                getBCHDigit(data) { let digit = 0; while (data !== 0) { digit++;
+                        data >>>= 1; } return digit; },
+                getPatternPosition(typeNumber) { return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1]; },
+                getMaskFunction(maskPattern) {
+                    switch (maskPattern) {
+                        case 0:
+                            return function(i, j) { return (i + j) % 2 === 0; };
+                        case 1:
+                            return function(i, j) { return i % 2 === 0; };
+                        case 2:
+                            return function(i, j) { return j % 3 === 0; };
+                        case 3:
+                            return function(i, j) { return (i + j) % 3 === 0; };
+                        case 4:
+                            return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0; };
+                        case 5:
+                            return function(i, j) { return (i * j) % 2 + (i * j) % 3 === 0; };
+                        case 6:
+                            return function(i, j) { return ((i * j) % 2 + (i * j) % 3) % 2 === 0; };
+                        case 7:
+                            return function(i, j) { return ((i * j) % 3 + (i + j) % 2) % 2 === 0; };
+                        default:
+                            throw new Error('bad maskPattern:' + maskPattern);
+                    }
+                },
+                getErrorCorrectPolynomial(errorCorrectLength) {
+                    let a = new QRPolynomial([1], 0);
+                    for (let i = 0; i < errorCorrectLength; i++) {
+                        a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0));
+                    }
+                    return a;
+                },
+                getLostPoint(qrCode) {
+                    let moduleCount = qrCode.getModuleCount();
+                    let lostPoint = 0;
+                    for (let row = 0; row < moduleCount; row++) {
+                        for (let col = 0; col < moduleCount; col++) {
+                            let sameCount = 0;
+                            let dark = qrCode.isDark(row, col);
+                            for (let r = -1; r <= 1; r++) {
+                                if (row + r < 0 || moduleCount <= row + r) continue;
+                                for (let c = -1; c <= 1; c++) {
+                                    if (col + c < 0 || moduleCount <= col + c) continue;
+                                    if (r === 0 && c === 0) continue;
+                                    if (dark === qrCode.isDark(row + r, col + c)) sameCount++;
+                                }
+                            }
+                            if (sameCount > 5) lostPoint += (3 + sameCount - 5);
+                        }
+                    }
+                    for (let row = 0; row < moduleCount - 1; row++) {
+                        for (let col = 0; col < moduleCount - 1; col++) {
+                            let count = 0;
+                            if (qrCode.isDark(row, col)) count++;
+                            if (qrCode.isDark(row + 1, col)) count++;
+                            if (qrCode.isDark(row, col + 1)) count++;
+                            if (qrCode.isDark(row + 1, col + 1)) count++;
+                            if (count === 0 || count === 4) lostPoint += 3;
+                        }
+                    }
+                    for (let row = 0; row < moduleCount; row++) {
+                        for (let col = 0; col < moduleCount - 6; col++) {
+                            if (qrCode.isDark(row, col) &&
+                                !qrCode.isDark(row, col + 1) &&
+                                qrCode.isDark(row, col + 2) &&
+                                qrCode.isDark(row, col + 3) &&
+                                qrCode.isDark(row, col + 4) &&
+                                !qrCode.isDark(row, col + 5) &&
+                                qrCode.isDark(row, col + 6)) {
+                                lostPoint += 40;
+                            }
+                        }
+                    }
+                    for (let col = 0; col < moduleCount; col++) {
+                        for (let row = 0; row < moduleCount - 6; row++) {
+                            if (qrCode.isDark(row, col) &&
+                                !qrCode.isDark(row + 1, col) &&
+                                qrCode.isDark(row + 2, col) &&
+                                qrCode.isDark(row + 3, col) &&
+                                qrCode.isDark(row + 4, col) &&
+                                !qrCode.isDark(row + 5, col) &&
+                                qrCode.isDark(row + 6, col)) {
+                                lostPoint += 40;
+                            }
+                        }
+                    }
+                    let darkCount = 0;
+                    for (let col = 0; col < moduleCount; col++) {
+                        for (let row = 0; row < moduleCount; row++) {
+                            if (qrCode.isDark(row, col)) darkCount++;
+                        }
+                    }
+                    let ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+                    lostPoint += ratio * 10;
+                    return lostPoint;
+                },
+                createData(typeNumber, errorCorrectLevel, dataList) {
+                    let rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+                    let buffer = new QRBitBuffer();
+                    for (let i = 0; i < dataList.length; i++) {
+                        let data = dataList[i];
+                        buffer.put(data.mode, 4);
+                        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber));
+                        data.write(buffer);
+                    }
+                    let totalDataCount = 0;
+                    for (let i = 0; i < rsBlocks.length; i++) totalDataCount += rsBlocks[i].dataCount;
+                    if (buffer.getLengthInBits() > totalDataCount * 8) {
+                        throw new Error('Code length overflow. (' + buffer.getLengthInBits() + '>' + totalDataCount *
+                            8 + ')');
+                    }
+                    if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) buffer.put(0, 4);
+                    while (buffer.getLengthInBits() % 8 !== 0) buffer.putBit(false);
+                    while (true) {
+                        if (buffer.getLengthInBits() >= totalDataCount * 8) break;
+                        buffer.put(PAD0, 8);
+                        if (buffer.getLengthInBits() >= totalDataCount * 8) break;
+                        buffer.put(PAD1, 8);
+                    }
+                    return createBytes(buffer, rsBlocks);
+                },
+                getLengthInBits(mode, type) {
+                    if (1 <= type && type < 10) {
+                        switch (mode) { case 4: return 8; default: throw new Error('mode:' + mode); }
+                    } else if (type < 27) {
+                        switch (mode) { case 4: return 16; default: throw new Error('mode:' + mode); }
+                    } else if (type < 41) {
+                        switch (mode) { case 4: return 16; default: throw new Error('mode:' + mode); }
+                    } else {
+                        throw new Error('type:' + type);
+                    }
+                }
+            };
+
+            function createBytes(buffer, rsBlocks) {
+                let offset = 0,
+                    maxDcCount = 0,
+                    maxEcCount = 0;
+                let dcdata = new Array(rsBlocks.length),
+                    ecdata = new Array(rsBlocks.length);
+                for (let r = 0; r < rsBlocks.length; r++) {
+                    let dcCount = rsBlocks[r].dataCount;
+                    let ecCount = rsBlocks[r].totalCount - dcCount;
+                    maxDcCount = Math.max(maxDcCount, dcCount);
+                    maxEcCount = Math.max(maxEcCount, ecCount);
+                    dcdata[r] = new Array(dcCount);
+                    for (let i = 0; i < dcdata[r].length; i++) {
+                        dcdata[r][i] = 0xff & buffer.buffer[i + offset];
+                    }
+                    offset += dcCount;
+                    let rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+                    let rawPoly = new QRPolynomial(dcdata[r], rsPoly.getLength() - 1);
+                    let modPoly = rawPoly.mod(rsPoly);
+                    ecdata[r] = new Array(rsPoly.getLength() - 1);
+                    for (let i = 0; i < ecdata[r].length; i++) {
+                        let modIndex = i + modPoly.getLength() - ecdata[r].length;
+                        ecdata[r][i] = (modIndex >= 0) ? modPoly.get(modIndex) : 0;
+                    }
+                }
+                let totalCodeCount = 0;
+                for (let i = 0; i < rsBlocks.length; i++) totalCodeCount += rsBlocks[i].totalCount;
+                let data = new Array(totalCodeCount);
+                let index = 0;
+                for (let i = 0; i < maxDcCount; i++) {
+                    for (let r = 0; r < rsBlocks.length; r++) {
+                        if (i < dcdata[r].length) data[index++] = dcdata[r][i];
+                    }
+                }
+                for (let i = 0; i < maxEcCount; i++) {
+                    for (let r = 0; r < rsBlocks.length; r++) {
+                        if (i < ecdata[r].length) data[index++] = ecdata[r][i];
+                    }
+                }
+                return data;
+            }
+
+            class QRRSBlock {
+                constructor(totalCount, dataCount) { this.totalCount = totalCount;
+                    this.dataCount = dataCount; }
+                static getRSBlocks(typeNumber, errorCorrectLevel) {
+                    let rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
+                    if (rsBlock === undefined) throw new Error('bad rs block @ typeNumber:' + typeNumber +
+                        '/errorCorrectLevel:' + errorCorrectLevel);
+                    let length = rsBlock.length / 3,
+                        list = [];
+                    for (let i = 0; i < length; i++) {
+                        let count = rsBlock[i * 3 + 0],
+                            totalCount = rsBlock[i * 3 + 1],
+                            dataCount = rsBlock[i * 3 + 2];
+                        for (let j = 0; j < count; j++) list.push(new QRRSBlock(totalCount, dataCount));
+                    }
+                    return list;
+                }
+                static getRsBlockTable(typeNumber, errorCorrectLevel) {
+                    switch (errorCorrectLevel) {
+                        case 1:
+                            return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+                        case 0:
+                            return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+                        case 3:
+                            return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+                        case 2:
+                            return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+                        default:
+                            return undefined;
+                    }
+                }
+            }
+            QRRSBlock.RS_BLOCK_TABLE = [
+                [1, 26, 19],
+                [1, 26, 16],
+                [1, 26, 13],
+                [1, 26, 9],
+                [1, 44, 34],
+                [1, 44, 28],
+                [1, 44, 22],
+                [1, 44, 16],
+                [1, 70, 55],
+                [1, 70, 44],
+                [2, 35, 17],
+                [2, 35, 13],
+                [1, 100, 80],
+                [2, 50, 32],
+                [2, 50, 24],
+                [4, 25, 9],
+                [1, 134, 108],
+                [2, 67, 43],
+                [2, 33, 15, 2, 34, 16],
+                [2, 33, 11, 2, 34, 12],
+                [2, 86, 68],
+                [4, 43, 27],
+                [4, 43, 19],
+                [4, 43, 15],
+                [2, 98, 78],
+                [4, 49, 31],
+                [2, 32, 14, 4, 33, 15],
+                [4, 39, 13, 1, 40, 14],
+                [2, 121, 97],
+                [2, 60, 38, 2, 61, 39],
+                [4, 40, 18, 2, 41, 19],
+                [4, 40, 14, 2, 41, 15],
+                [2, 146, 116],
+                [3, 58, 36, 2, 59, 37],
+                [4, 36, 16, 4, 37, 17],
+                [4, 36, 12, 4, 37, 13],
+                [2, 86, 68, 2, 87, 69],
+                [4, 69, 43, 1, 70, 44],
+                [6, 43, 19, 2, 44, 20],
+                [6, 43, 15, 2, 44, 16],
+                [4, 101, 81],
+                [1, 80, 50, 4, 81, 51],
+                [4, 50, 22, 4, 51, 23],
+                [3, 36, 12, 8, 37, 13],
+                [2, 116, 92, 2, 117, 93],
+                [6, 58, 36, 2, 59, 37],
+                [4, 46, 20, 6, 47, 21],
+                [7, 42, 14, 4, 43, 15],
+                [4, 133, 107],
+                [8, 59, 37, 1, 60, 38],
+                [8, 44, 20, 4, 45, 21],
+                [12, 33, 11, 4, 34, 12],
+                [3, 145, 115, 1, 146, 116],
+                [4, 64, 40, 5, 65, 41],
+                [11, 36, 16, 5, 37, 17],
+                [11, 36, 12, 5, 37, 13],
+                [5, 109, 87, 1, 110, 88],
+                [5, 65, 41, 5, 66, 42],
+                [5, 54, 24, 7, 55, 25],
+                [11, 36, 12],
+                [5, 122, 98, 1, 123, 99],
+                [7, 73, 45, 3, 74, 46],
+                [15, 43, 19, 2, 44, 20],
+                [3, 45, 15, 13, 46, 16],
+                [1, 135, 107, 5, 136, 108],
+                [10, 74, 46, 1, 75, 47],
+                [1, 50, 22, 15, 51, 23],
+                [2, 42, 14, 17, 43, 15],
+                [5, 150, 120, 1, 151, 121],
+                [9, 69, 43, 4, 70, 44],
+                [17, 50, 22, 1, 51, 23],
+                [2, 42, 14, 19, 43, 15],
+                [3, 141, 113, 4, 142, 114],
+                [3, 70, 44, 11, 71, 45],
+                [17, 47, 21, 4, 48, 22],
+                [9, 39, 13, 16, 40, 14],
+                [3, 135, 107, 5, 136, 108],
+                [3, 67, 41, 13, 68, 42],
+                [15, 54, 24, 5, 55, 25],
+                [15, 43, 15, 10, 44, 16],
+                [4, 144, 116, 4, 145, 117],
+                [17, 68, 42],
+                [17, 50, 22, 6, 51, 23],
+                [19, 46, 16, 6, 47, 17],
+                [2, 139, 111, 7, 140, 112],
+                [17, 74, 46],
+                [7, 54, 24, 16, 55, 25],
+                [34, 37, 13],
+                [4, 151, 121, 5, 152, 122],
+                [4, 75, 47, 14, 76, 48],
+                [11, 54, 24, 14, 55, 25],
+                [16, 45, 15, 14, 46, 16],
+                [6, 147, 117, 4, 148, 118],
+                [6, 73, 45, 14, 74, 46],
+                [11, 54, 24, 16, 55, 25],
+                [30, 46, 16, 2, 47, 17],
+                [8, 132, 106, 4, 133, 107],
+                [8, 75, 47, 13, 76, 48],
+                [7, 54, 24, 22, 55, 25],
+                [22, 45, 15, 13, 46, 16],
+                [10, 142, 114, 2, 143, 115],
+                [19, 74, 46, 4, 75, 47],
+                [28, 50, 22, 6, 51, 23],
+                [33, 46, 16, 4, 47, 17],
+                [8, 152, 122, 4, 153, 123],
+                [22, 73, 45, 3, 74, 46],
+                [8, 53, 23, 26, 54, 24],
+                [12, 45, 15, 28, 46, 16],
+                [3, 147, 117, 10, 148, 118],
+                [3, 73, 45, 23, 74, 46],
+                [4, 54, 24, 31, 55, 25],
+                [11, 45, 15, 31, 46, 16],
+                [7, 146, 116, 7, 147, 117],
+                [21, 73, 45, 7, 74, 46],
+                [1, 53, 23, 37, 54, 24],
+                [19, 45, 15, 26, 46, 16],
+                [5, 145, 115, 10, 146, 116],
+                [19, 75, 47, 10, 76, 48],
+                [15, 54, 24, 25, 55, 25],
+                [23, 45, 15, 25, 46, 16],
+                [13, 145, 115, 3, 146, 116],
+                [2, 74, 46, 29, 75, 47],
+                [42, 54, 24, 1, 55, 25],
+                [23, 45, 15, 28, 46, 16],
+                [17, 145, 115],
+                [10, 74, 46, 23, 75, 47],
+                [10, 54, 24, 35, 55, 25],
+                [19, 45, 15, 35, 46, 16],
+                [17, 145, 115, 1, 146, 116],
+                [14, 74, 46, 21, 75, 47],
+                [29, 54, 24, 19, 55, 25],
+                [11, 45, 15, 46, 46, 16],
+                [13, 145, 115, 6, 146, 116],
+                [14, 74, 46, 23, 75, 47],
+                [44, 54, 24, 7, 55, 25],
+                [59, 46, 16, 1, 47, 17],
+                [12, 151, 121, 7, 152, 122],
+                [12, 75, 47, 26, 76, 48],
+                [39, 54, 24, 14, 55, 25],
+                [22, 45, 15, 41, 46, 16],
+                [6, 151, 121, 14, 152, 122],
+                [6, 75, 47, 34, 76, 48],
+                [46, 54, 24, 10, 55, 25],
+                [2, 45, 15, 64, 46, 16],
+                [17, 152, 122, 4, 153, 123],
+                [29, 74, 46, 14, 75, 47],
+                [49, 54, 24, 10, 55, 25],
+                [24, 45, 15, 46, 46, 16],
+                [4, 152, 122, 18, 153, 123],
+                [13, 74, 46, 32, 75, 47],
+                [48, 54, 24, 14, 55, 25],
+                [42, 45, 15, 32, 46, 16],
+                [20, 147, 117, 4, 148, 118],
+                [40, 75, 47, 7, 76, 48],
+                [43, 54, 24, 22, 55, 25],
+                [10, 45, 15, 67, 46, 16],
+                [19, 148, 118, 6, 149, 119],
+                [18, 75, 47, 31, 76, 48],
+                [34, 54, 24, 34, 55, 25],
+                [20, 45, 15, 61, 46, 16]
+            ];
+
+            function getTypeNumber(dataLength, errorCorrectLevel) {
+                for (let typeNumber = 1; typeNumber <= 40; typeNumber++) {
+                    let rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+                    let totalDataCount = 0;
+                    for (let i = 0; i < rsBlocks.length; i++) totalDataCount += rsBlocks[i].dataCount;
+                    let overhead = 4 + 8 + 16 + 8 + 8;
+                    if (dataLength * 8 + overhead <= totalDataCount * 8) return typeNumber;
+                }
+                return 40;
+            }
+
+            function createQRCode(text, errorCorrectLevel) {
+                QRMath.init();
+                let dataBytes = [];
+                for (let i = 0; i < text.length; i++) {
+                    let code = text.charCodeAt(i);
+                    if (code > 0x10000) {
+                        dataBytes.push(0xF0 | ((code & 0x1C0000) >>> 18));
+                        dataBytes.push(0x80 | ((code & 0x3F000) >>> 12));
+                        dataBytes.push(0x80 | ((code & 0xFC0) >>> 6));
+                        dataBytes.push(0x80 | (code & 0x3F));
+                    } else if (code > 0x800) {
+                        dataBytes.push(0xE0 | ((code & 0xF000) >>> 12));
+                        dataBytes.push(0x80 | ((code & 0xFC0) >>> 6));
+                        dataBytes.push(0x80 | (code & 0x3F));
+                    } else if (code > 0x80) {
+                        dataBytes.push(0xC0 | ((code & 0x7C0) >>> 6));
+                        dataBytes.push(0x80 | (code & 0x3F));
+                    } else {
+                        dataBytes.push(code);
+                    }
+                }
+                let typeNumber = getTypeNumber(dataBytes.length, errorCorrectLevel);
+                let qr = new QRCodeModel(typeNumber, errorCorrectLevel);
+                qr.addData(text);
+                qr.make();
+                return qr;
+            }
+
+            return {
+                create: createQRCode,
+                ErrorCorrectLevel: QRErrorCorrectLevel
+            };
+        })();
+
+        function renderQRToCanvas(canvasEl, text, size, fgColor, bgColor, ecLevel) {
+            if (!canvasEl) return;
+            const ec = ecLevel || QRCodeCore.ErrorCorrectLevel.M;
+            const qr = QRCodeCore.create(text, ec);
+            const moduleCount = qr.getModuleCount();
+            const cellSize = Math.max(1, Math.floor(size / (moduleCount + 8)));
+            const totalSize = cellSize * (moduleCount + 8);
+            const offset = 4 * cellSize;
+            canvasEl.width = totalSize;
+            canvasEl.height = totalSize;
+            const ctx = canvasEl.getContext('2d');
+            ctx.fillStyle = bgColor || '#ffffff';
+            ctx.fillRect(0, 0, totalSize, totalSize);
+            ctx.fillStyle = fgColor || '#000000';
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qr.isDark(row, col)) {
+                        ctx.fillRect(offset + col * cellSize, offset + row * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            return canvasEl;
+        }
+
+        function generateQRInContainer(containerId, text, size, fg, bg, ec) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            canvas.style.maxWidth = '100%';
+            canvas.style.height = 'auto';
+            container.appendChild(canvas);
+            renderQRToCanvas(canvas, text, size || 200, fg || '#000000', bg || '#ffffff', ec);
+            return canvas;
+        }
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!--  MAIN APP LOGIC                                              -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <script>
+        (function() {
+            'use strict';
+
+            const STORAGE = {
+                PRIVATE_JWK: 'vishu_private_jwk',
+                PUBLIC_RAW: 'vishu_public_raw',
+                USERNAME: 'vishu_username',
+                BALANCE: 'vishu_balance',
+                CONTACTS: 'vishu_contacts',
+                HISTORY: 'vishu_history',
+                NONCES: 'vishu_nonces'
+            };
+
+            let state = {
+                pubkey: null,
+                username: 'User',
+                balance: 0,
+                contacts: {},
+                history: [],
+                nonces: [],
+                scannedRequest: null,
+                pendingTx: null,
+                cameraStream: null,
+                currentNonce: null,
+                isScanning: false,
+                torchOn: false
+            };
+
+            // ─── Crypto ───
+            async function generateKeyPair() {
+                const kp = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign',
+                    'verify'
+                ]);
+                const raw = await crypto.subtle.exportKey('raw', kp.publicKey);
+                const jwk = await crypto.subtle.exportKey('jwk', kp.privateKey);
+                return {
+                    publicRaw: btoa(String.fromCharCode(...new Uint8Array(raw))),
+                    privateJwk: JSON.stringify(jwk)
+                };
+            }
+
+            async function sign(privJwk, data) {
+                const key = await crypto.subtle.importKey('jwk', JSON.parse(privJwk), { name: 'ECDSA',
+                    namedCurve: 'P-256' }, false, ['sign']);
+                const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+                const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, hash);
+                return btoa(String.fromCharCode(...new Uint8Array(sig)));
+            }
+
+            async function verify(pubRawB64, data, sigB64) {
+                try {
+                    const key = await crypto.subtle.importKey('raw',
+                        Uint8Array.from(atob(pubRawB64), c => c.charCodeAt(0)).buffer, { name: 'ECDSA',
+                            namedCurve: 'P-256' }, false, ['verify']);
+                    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+                    return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key,
+                        Uint8Array.from(atob(sigB64), c => c.charCodeAt(0)).buffer, hash);
+                } catch (_) { return false; }
+            }
+
+            // ─── Load / Save ───
+            function loadState() {
+                const priv = localStorage.getItem(STORAGE.PRIVATE_JWK);
+                const pub = localStorage.getItem(STORAGE.PUBLIC_RAW);
+                state.username = localStorage.getItem(STORAGE.USERNAME) || 'User';
+                state.balance = parseInt(localStorage.getItem(STORAGE.BALANCE) || '0');
+                state.contacts = JSON.parse(localStorage.getItem(STORAGE.CONTACTS) || '{}');
+                state.history = JSON.parse(localStorage.getItem(STORAGE.HISTORY) || '[]');
+                state.nonces = JSON.parse(localStorage.getItem(STORAGE.NONCES) || '[]');
+
+                if (!priv || !pub) {
+                    // New user: generate keys and give ₹500 welcome bonus
+                    generateKeyPair().then(keys => {
+                        localStorage.setItem(STORAGE.PRIVATE_JWK, keys.privateJwk);
+                        localStorage.setItem(STORAGE.PUBLIC_RAW, keys.publicRaw);
+                        state.pubkey = keys.publicRaw;
+                        const uname = prompt('Choose your username:', 'User') || 'User';
+                        localStorage.setItem(STORAGE.USERNAME, uname);
+                        state.username = uname;
+                        // Give ₹500 welcome bonus
+                        state.balance = 500;
+                        saveBalance();
+                        updateUI();
+                        showToast('🎉 Welcome ' + uname + '! ₹500 credited!');
+                    });
+                } else {
+                    state.pubkey = pub;
+                    updateUI();
+                }
+            }
+
+            function saveBalance() { localStorage.setItem(STORAGE.BALANCE, state.balance.toString()); }
+
+            function saveContacts() { localStorage.setItem(STORAGE.CONTACTS, JSON.stringify(state.contacts)); }
+
+            function saveHistory() { localStorage.setItem(STORAGE.HISTORY, JSON.stringify(state.history)); }
+
+            function saveNonces() { localStorage.setItem(STORAGE.NONCES, JSON.stringify(state.nonces)); }
+
+            function saveUsername() { localStorage.setItem(STORAGE.USERNAME, state.username); }
+
+            function getFriendlyName(pubkey) {
+                return state.contacts[pubkey] || 'Unknown';
+            }
+
+            function updateUI() {
+                const balanceEl = document.getElementById('balanceDisplay');
+                const oldVal = balanceEl.innerText;
+                const newVal = '₹' + state.balance;
+                if (oldVal !== newVal) {
+                    balanceEl.classList.remove('pulse');
+                    balanceEl.innerText = newVal;
+                    void balanceEl.offsetWidth;
+                    balanceEl.classList.add('pulse');
+                } else {
+                    balanceEl.innerText = newVal;
+                }
+                document.getElementById('userNameDisplay').innerText = state.username;
+                document.getElementById('profileName').innerText = state.username;
+                document.getElementById('profileAvatar').innerText = state.username.charAt(0).toUpperCase();
+                renderHistory();
+                renderRecent();
+                renderContacts();
+            }
+
+            function renderHistory(filter) {
+                const list = document.getElementById('historyList');
+                let items = state.history;
+                if (filter) {
+                    const f = filter.toLowerCase();
+                    items = items.filter(tx =>
+                        (tx.counterParty || '').toLowerCase().includes(f) ||
+                        tx.amount.toString().includes(f)
+                    );
+                }
+                if (!items.length) {
+                    list.innerHTML =
+                        `<div class="empty-state"><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg></div><div class="title">No transactions</div><div class="desc">Your token history</div></div>`;
+                    return;
+                }
+                list.innerHTML = items.map((tx, idx) => `
+                    <div class="tx-item" data-idx="${idx}">
+                        <div class="tx-icon ${tx.type === 'sent' ? 'tx-icon-sent' : 'tx-icon-received'}">
+                            ${tx.type === 'sent' 
+                                ? '<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>'
+                                : '<svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>'}
+                        </div>
+                        <div class="tx-info">
+                            <div class="name">${tx.counterParty || 'Unknown'}</div>
+                            <div class="meta">
+                                <span>${tx.timestamp || ''}</span>
+                                ${tx.type === 'sent' ? '<span style="color:#ff3b30;">● sent</span>' : '<span style="color:#34c759;">● received</span>'}
+                            </div>
+                        </div>
+                        <div class="tx-amount ${tx.type === 'sent' ? 'tx-amount-sent' : 'tx-amount-received'}">${tx.type === 'sent' ? '-' : '+'} ₹${tx.amount}</div>
+                    </div>
+                `).join('');
+
+                list.querySelectorAll('.tx-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.idx);
+                        const tx = state.history[idx];
+                        if (tx) showTxDetail(tx);
+                    });
+                });
+            }
+
+            function renderRecent() {
+                const container = document.getElementById('recentList');
+                const recent = state.history.slice(0, 5);
+                if (!recent.length) {
+                    container.innerHTML =
+                        `<div class="empty-state"><div class="icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg></div><div class="title">No transactions</div><div class="desc">Send or receive tokens</div></div>`;
+                    return;
+                }
+                container.innerHTML = recent.map(tx => `
+                    <div class="tx-item" style="padding:8px 0;">
+                        <div class="tx-icon ${tx.type === 'sent' ? 'tx-icon-sent' : 'tx-icon-received'}" style="width:32px;height:32px;font-size:0.9rem;">
+                            ${tx.type === 'sent' 
+                                ? '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>'
+                                : '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>'}
+                        </div>
+                        <div class="tx-info">
+                            <div class="name" style="font-size:0.85rem;">${tx.counterParty || 'Unknown'}</div>
+                            <div class="meta" style="font-size:0.65rem;">${tx.timestamp || ''}</div>
+                        </div>
+                        <div class="tx-amount ${tx.type === 'sent' ? 'tx-amount-sent' : 'tx-amount-received'}" style="font-size:0.9rem;">${tx.type === 'sent' ? '-' : '+'} ₹${tx.amount}</div>
+                    </div>
+                `).join('');
+            }
+
+            function renderContacts() {
+                const container = document.getElementById('contactsList');
+                const keys = Object.keys(state.contacts);
+                if (!keys.length) {
+                    container.innerHTML =
+                        `<div class="empty-state"><div class="icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><div class="title">No contacts</div><div class="desc">Add or transact to save</div></div>`;
+                    return;
+                }
+                container.innerHTML = keys.map(pub => `
+                    <div class="tx-item" style="padding:8px 0;">
+                        <div class="contact-avatar" style="width:36px;height:36px;font-size:0.8rem;">${(state.contacts[pub] || 'U').charAt(0).toUpperCase()}</div>
+                        <div class="tx-info">
+                            <div class="name" style="font-size:0.9rem;">${state.contacts[pub]}</div>
+                        </div>
+                        <button class="contact-chip" data-pub="${pub}" style="background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.15);color:#ff3b30;font-size:0.7rem;padding:2px 10px;">Remove</button>
+                    </div>
+                `).join('');
+
+                container.querySelectorAll('.contact-chip').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const pub = this.dataset.pub;
+                        if (confirm('Remove ' + (state.contacts[pub] || 'contact') + '?')) {
+                            delete state.contacts[pub];
+                            saveContacts();
+                            renderContacts();
+                            showToast('Contact removed');
+                        }
+                    });
+                });
+            }
+
+            function showTxDetail(tx) {
+                const msg =
+                    `Transaction\n\nCounterparty: ${tx.counterParty}\nAmount: ₹${tx.amount}\nType: ${tx.type}\nTime: ${tx.timestamp || 'N/A'}`;
+                alert(msg);
+            }
+
+            function addHistory(type, counterPubkey, amount) {
+                const name = getFriendlyName(counterPubkey);
+                const entry = {
+                    type,
+                    counterParty: name,
+                    amount,
+                    timestamp: new Date().toLocaleString()
+                };
+                state.history.unshift(entry);
+                if (state.history.length > 100) state.history.pop();
+                saveHistory();
+                updateUI();
+            }
+
+            function showToast(msg) {
+                const existing = document.querySelector('.toast');
+                if (existing) existing.remove();
+                const el = document.createElement('div');
+                el.className = 'toast';
+                el.textContent = msg;
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 2600);
+            }
+
+            function vibrate(pattern) {
+                try { navigator.vibrate && navigator.vibrate(pattern || 20); } catch (_) {}
+            }
+
+            // ─── Tab Switching ───
+            function switchTab(tab) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                const screen = document.getElementById(tab + 'Screen');
+                if (screen) screen.classList.add('active');
+                const nav = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+                if (nav) nav.classList.add('active');
+                closeScanner();
+                document.getElementById('receiveResult').style.display = 'none';
+                document.getElementById('receiveResult').innerHTML = '';
+                if (tab === 'history') renderHistory();
+                if (tab === 'profile') updateUI();
+                if (tab === 'contacts') renderContacts();
+                if (tab === 'receive') {
+                    const area = document.getElementById('receiveRequestArea');
+                    if (area.style.display !== 'none') {
+                        const container = document.getElementById('receiveRequestQR');
+                        if (!container.querySelector('canvas')) {
+                            generateRequestQR();
+                        }
+                    }
+                }
+            }
+
+            // ─── Full Screen Scanner ───
+            const scannerOverlay = document.getElementById('scannerOverlay');
+            const scannerVideo = document.getElementById('scannerVideo');
+            let scannerResolve = null;
+
+            function openScanner() {
+                return new Promise((resolve) => {
+                    scannerResolve = resolve;
+                    scannerOverlay.classList.add('active');
+                    startScannerStream();
+                });
+            }
+
+            function closeScanner() {
+                scannerOverlay.classList.remove('active');
+                if (state.cameraStream) {
+                    state.cameraStream.getTracks().forEach(t => t.stop());
+                    state.cameraStream = null;
+                }
+                state.isScanning = false;
+                state.torchOn = false;
+                document.getElementById('scannerTorchBtn').textContent = 'Torch';
+                if (scannerResolve) {
+                    scannerResolve(null);
+                    scannerResolve = null;
+                }
+            }
+
+            function startScannerStream() {
+                if (state.isScanning) return;
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 },
+                            height: { ideal: 480 } } })
+                    .then(stream => {
+                        state.cameraStream = stream;
+                        state.isScanning = true;
+                        scannerVideo.srcObject = stream;
+                        scannerVideo.play();
+
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        let frameId = null;
+                        let lastResult = null;
+
+                        function scan() {
+                            if (!state.isScanning || !state.cameraStream || !scannerOverlay.classList.contains(
+                                    'active')) {
+                                if (frameId) cancelAnimationFrame(frameId);
+                                return;
+                            }
+                            if (scannerVideo.readyState === scannerVideo.HAVE_ENOUGH_DATA && scannerVideo
+                                .videoWidth > 0) {
+                                canvas.width = scannerVideo.videoWidth;
+                                canvas.height = scannerVideo.videoHeight;
+                                ctx.drawImage(scannerVideo, 0, 0, canvas.width, canvas.height);
+                                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                                try {
+                                    const code = jsQR(imgData.data, imgData.width, imgData.height, {
+                                        inversionAttempts: 'dontInvert'
+                                    });
+                                    if (code && code.data) {
+                                        const dataStr = code.data;
+                                        if (dataStr !== lastResult) {
+                                            lastResult = dataStr;
+                                            state.isScanning = false;
+                                            vibrate(30);
+                                            closeScanner();
+                                            if (scannerResolve) {
+                                                scannerResolve(dataStr);
+                                                scannerResolve = null;
+                                            }
+                                            return;
+                                        }
+                                    }
+                                } catch (_) { /* ignore */ }
+                            }
+                            frameId = requestAnimationFrame(scan);
+                        }
+                        scan();
+                    })
+                    .catch(err => {
+                        showToast('Camera error: ' + err.message);
+                        closeScanner();
+                    });
+            }
+
+            // Scanner controls
+            document.getElementById('scannerCloseBtn').addEventListener('click', closeScanner);
+            document.getElementById('scannerCancelBtn').addEventListener('click', closeScanner);
+            document.getElementById('scannerTorchBtn').addEventListener('click', function() {
+                if (!state.cameraStream) return;
+                state.torchOn = !state.torchOn;
+                const tracks = state.cameraStream.getVideoTracks();
+                if (tracks.length) {
+                    try {
+                        tracks[0].applyConstraints({
+                            advanced: [{ torch: state.torchOn }]
+                        });
+                    } catch (_) { /* fallback */ }
+                }
+                this.textContent = state.torchOn ? 'On' : 'Torch';
+            });
+
+            // ─── QR Generation ───
+            function showQR(containerId, text, size) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = '';
+                const canvas = document.createElement('canvas');
+                canvas.style.maxWidth = '100%';
+                canvas.style.height = 'auto';
+                container.appendChild(canvas);
+                try {
+                    renderQRToCanvas(canvas, text, size || 200, '#1c1c1e', '#ffffff', QRCodeCore.ErrorCorrectLevel.M);
+                } catch (e) {
+                    container.innerHTML = '<div class="qr-placeholder">Error</div>';
+                    console.error(e);
+                }
+            }
+
+            function generateRequestQR() {
+                state.currentNonce = Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+                const req = {
+                    type: 'request',
+                    pubkey: state.pubkey,
+                    nonce: state.currentNonce,
+                    senderUsername: state.username
+                };
+                document.getElementById('receiveRequestArea').style.display = 'block';
+                document.getElementById('receiveResult').style.display = 'none';
+                showQR('receiveRequestQR', JSON.stringify(req), 200);
+                showToast('Show QR to sender');
+            }
+
+            // ─── Send Flow ───
+            async function startSendScan() {
+                document.getElementById('sendConfirmArea').style.display = 'none';
+                document.getElementById('sendQRDisplay').style.display = 'none';
+                state.scannedRequest = null;
+                const data = await openScanner();
+                if (!data) return;
+                try {
+                    const req = JSON.parse(data);
+                    if (req.type !== 'request' || !req.pubkey || !req.nonce) {
+                        showToast('Invalid request QR');
+                        return;
+                    }
+                    if (state.nonces.includes(req.nonce)) {
+                        showToast('Request already used');
+                        return;
+                    }
+                    if (req.pubkey === state.pubkey) {
+                        showToast('Cannot pay yourself');
+                        return;
+                    }
+                    state.scannedRequest = req;
+                    const name = getFriendlyName(req.pubkey) || req.senderUsername || 'Unknown';
+                    document.getElementById('sendToUser').innerText = name;
+                    document.getElementById('sendConfirmArea').style.display = 'block';
+                    document.getElementById('sendAmount').focus();
+                    showToast('Ready to pay ' + name);
+                    vibrate(20);
+                } catch (_) {
+                    showToast('Invalid QR code');
+                }
+            }
+
+            async function confirmSend() {
+                const amount = parseInt(document.getElementById('sendAmount').value);
+                if (isNaN(amount) || amount <= 0) {
+                    showToast('Enter a valid amount');
+                    return;
+                }
+                if (amount > state.balance) {
+                    showToast('Insufficient balance');
+                    return;
+                }
+                const req = state.scannedRequest;
+                if (!req) {
+                    showToast('No request scanned');
+                    return;
+                }
+
+                const payload = {
+                    type: 'tx',
+                    from: state.pubkey,
+                    to: req.pubkey,
+                    amount: amount,
+                    nonce: req.nonce,
+                    timestamp: Date.now(),
+                    senderUsername: state.username
+                };
+
+                try {
+                    const sig = await sign(localStorage.getItem(STORAGE.PRIVATE_JWK), JSON.stringify(payload));
+                    const signed = { payload, sig };
+
+                    state.balance -= amount;
+                    saveBalance();
+                    addHistory('sent', req.pubkey, amount);
+
+                    if (!state.contacts[req.pubkey]) {
+                        state.contacts[req.pubkey] = req.senderUsername || 'User';
+                        saveContacts();
+                    }
+
+                    document.getElementById('sendConfirmArea').style.display = 'none';
+                    document.getElementById('sendAmount').value = '';
+                    document.getElementById('sendQRDisplay').style.display = 'block';
+                    showQR('sendPaymentQR', JSON.stringify(signed), 200);
+                    state.pendingTx = signed;
+                    updateUI();
+                    vibrate(50);
+                    showToast('Payment signed! Show QR to receiver.');
+                } catch (e) {
+                    showToast('Signing failed: ' + e.message);
+                }
+            }
+
+            function cancelSend() {
+                document.getElementById('sendConfirmArea').style.display = 'none';
+                document.getElementById('sendQRDisplay').style.display = 'none';
+                document.getElementById('sendAmount').value = '';
+                state.scannedRequest = null;
+                state.pendingTx = null;
+                closeScanner();
+            }
+
+            function doneSend() {
+                document.getElementById('sendQRDisplay').style.display = 'none';
+                state.pendingTx = null;
+                state.scannedRequest = null;
+                switchTab('home');
+            }
+
+            // ─── Receive Flow ───
+            async function startReceiveScan() {
+                document.getElementById('receiveResult').style.display = 'none';
+                const data = await openScanner();
+                if (!data) return;
+                try {
+                    const signed = JSON.parse(data);
+                    if (!signed.payload || !signed.sig) throw new Error('Invalid');
+                    if (signed.payload.type !== 'tx') throw new Error('Not a payment');
+
+                    const valid = await verify(signed.payload.from, JSON.stringify(signed.payload), signed.sig);
+                    if (!valid) {
+                        showToast('Invalid signature!');
+                        vibrate(100);
+                        return;
+                    }
+
+                    if (state.nonces.includes(signed.payload.nonce)) {
+                        showToast('Already received');
+                        return;
+                    }
+
+                    state.balance += signed.payload.amount;
+                    state.nonces.push(signed.payload.nonce);
+                    saveNonces();
+                    saveBalance();
+
+                    const fromName = signed.payload.senderUsername || getFriendlyName(signed.payload.from);
+                    if (!state.contacts[signed.payload.from]) {
+                        state.contacts[signed.payload.from] = fromName;
+                        saveContacts();
+                    }
+                    addHistory('received', signed.payload.from, signed.payload.amount);
+                    updateUI();
+
+                    const resultEl = document.getElementById('receiveResult');
+                    resultEl.innerHTML =
+                        `<div style="font-size:2rem;">✓</div><div style="font-weight:600;color:#34c759;">Received ₹${signed.payload.amount}</div><div style="font-size:0.85rem;color:var(--text-muted);">from ${fromName}</div>`;
+                    resultEl.style.display = 'block';
+                    showToast('Received ₹' + signed.payload.amount);
+                    vibrate(60);
+                    state.currentNonce = null;
+                    document.getElementById('receiveRequestArea').style.display = 'none';
+                } catch (e) {
+                    showToast('Invalid payment QR: ' + e.message);
+                    vibrate(80);
+                }
+            }
+
+            // ─── Add Contact ───
+            function addContact() {
+                const input = document.getElementById('addContactInput');
+                const val = input.value.trim();
+                if (!val) { showToast('Enter a name'); return; }
+                showToast('Contacts are added automatically from transactions');
+            }
+
+            // ─── Init ───
+            window.onload = function() {
+                loadState();
+
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', () => switchTab(item.dataset.tab));
+                });
+
+                document.querySelectorAll('.quick-item[data-tab]').forEach(el => {
+                    el.addEventListener('click', () => switchTab(el.dataset.tab));
+                });
+
+                document.getElementById('profileBtn').addEventListener('click', () => switchTab('profile'));
+                document.getElementById('saveUsernameBtn').addEventListener('click', function() {
+                    const input = document.getElementById('editUsernameInput');
+                    const val = input.value.trim();
+                    if (val) {
+                        state.username = val;
+                        saveUsername();
+                        updateUI();
+                        input.value = '';
+                        showToast('Username updated');
+                        vibrate(10);
+                    } else {
+                        showToast('Enter a username');
+                    }
+                });
+                document.getElementById('editUsernameInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') document.getElementById('saveUsernameBtn').click();
+                });
+
+                document.getElementById('contactsManageBtn').addEventListener('click', () => {
+                    switchTab('contacts');
+                    renderContacts();
+                });
+                document.getElementById('backFromContacts').addEventListener('click', () => switchTab('profile'));
+                document.getElementById('addContactBtn').addEventListener('click', addContact);
+                document.getElementById('addContactInput').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') addContact();
+                });
+
+                document.getElementById('searchToggleBtn').addEventListener('click', function() {
+                    const box = document.getElementById('searchBox');
+                    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+                    if (box.style.display === 'block') {
+                        document.getElementById('historySearch').focus();
+                    }
+                });
+                document.getElementById('historySearch').addEventListener('input', function() {
+                    renderHistory(this.value);
+                });
+
+                document.getElementById('scanReceiveQRBtn').addEventListener('click', startSendScan);
+                document.getElementById('confirmSendBtn').addEventListener('click', confirmSend);
+                document.getElementById('cancelSendBtn').addEventListener('click', cancelSend);
+                document.getElementById('doneSendBtn').addEventListener('click', doneSend);
+                document.getElementById('sendAmount').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') confirmSend();
+                });
+
+                document.getElementById('generateRequestBtn').addEventListener('click', generateRequestQR);
+                document.getElementById('scanPaymentQRBtn').addEventListener('click', startReceiveScan);
+
+                document.getElementById('refreshBalanceBtn').addEventListener('click', () => {
+                    updateUI();
+                    showToast('Refreshed');
+                    vibrate(5);
+                });
+
+                showToast('VishuXpay ready');
+            };
+
+        })();
+    </script>
+
+</body>
+</html>
